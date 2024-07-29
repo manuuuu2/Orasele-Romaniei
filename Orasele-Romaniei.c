@@ -6,6 +6,7 @@
 #include<dos.h>
 #include<stdlib.h>
 #include<string.h>
+#include <algorithm>
 #include<math.h>
 #include<iomanip.h>
 #include <ctype.h>
@@ -31,8 +32,8 @@ void autor();
 int concluzie_quiz();
 void introducere();
 void citintreb();
-int calculateDistance(int x1, int y1, int x2, int y2);
-void afisconcl(int corecte, int gresite);
+int calculateDistance(int x1, int y1, int x2, int y2); 
+void afisconcl(int corecte, int gresite); 
 void sortare_descrescator_oras();
 void sortare_crescator_oras();
 void sortare_crescator_judet();
@@ -52,85 +53,101 @@ int verific_pass(char usernou[22]);
 bool username_exists(const char* usernou);
 void autentificare();
 void verific_user_autentificare(char user[22]);
-void colajfoto();
+void foto();
 void cautare_dupa_altitudine();
+int decodific(char cuv_codat[99]);
+int codific(char cuv[99]);
+void administrare();
+void displayLeaderboard(int corecte, int gresite);
+void foto();
+void foto1();
+void cuvnepotr();
+void foto2();
+void foto3();
+void foto4();
+void foto5();
+void foto6();
+void foto7();
+void updateLeaderboard(const char* user, int score) ;
+void afisare_leaderboard() ;
+void cuvpotr();
 
 struct orase
-{
-    char oras[99];
-    char jud[20];
-    char pop[99];
-    char alt[99];
-    char harta[99];
-    int h;
-}
-e[320];
-int n;
-char oraselista[320][30];
-int inregistrat = 0;
-
+	{
+		char oras[99];
+		char jud[20];
+		char pop[99];
+		char alt[99];
+		char harta[99];
+		int h;
+	}
+	e[320];
+	int n;
+	char oraselista[320][30],user[20];
+	int inregistrat = 0,adminn=0;
+	
 int main()
-{
-    initializare();
-    memo();
-    introducere();
-    motto();
-    meniu_1();
-    cautare();
-    return 0;
+{ 
+  initializare();
+  memo();
+  introducere();
+  motto();
+  meniu_1();
+  cautare();
+  return 0;
 }
 
 void motto()
-{
-    int ok = 0, x, y;
-    cleardevice();
-    readimagefile("Imagini/intro.gif", 0, 0, 1440, 800);
-    while (!ok)
-    {
+	{ 
+		int ok=0,x,y;
+	cleardevice();
+	readimagefile("Imagini/intro.gif", 0, 0, 1440, 800);
+		while (!ok) 
+		{
+			
+			if (ismouseclick(WM_MOUSEMOVE)) 
+			{
+				getmouseclick(WM_MOUSEMOVE, x, y);
+				if (x > 1161 && x < 1245 && y > 159&& y < 236)
+					readimagefile("Imagini/intrhov.gif", 0, 0, 1440, 800);
+				else
+					readimagefile("Imagini/intro.gif", 0, 0, 1440, 800);
+			}
+			if (ismouseclick(WM_LBUTTONDOWN)) 
+			{
+				getmouseclick(WM_LBUTTONDOWN, x, y);
+				if (x > 1161 && x < 1245 && y > 159&& y < 236)
+				{
+				   ok = 1;
+			      meniu_1();
+		}
+			}}
+	getch();
 
-        if (ismouseclick(WM_MOUSEMOVE))
-        {
-            getmouseclick(WM_MOUSEMOVE, x, y);
-            if (x > 1161 && x < 1245 && y > 159 && y < 236)
-                readimagefile("Imagini/intrhov.gif", 0, 0, 1440, 800);
-            else
-                readimagefile("Imagini/intro.gif", 0, 0, 1440, 800);
-        }
-        if (ismouseclick(WM_LBUTTONDOWN))
-        {
-            getmouseclick(WM_LBUTTONDOWN, x, y);
-            if (x > 1161 && x < 1245 && y > 159 && y < 236)
-            {
-                ok = 1;
-                meniu_1();
-            }
-        }
-    }
-    getch();
-
-}
+	}
 
 int nd;
 int dist[50][50];
 char l[50][50];
 
 void memo_dist() {
-    readimagefile("Imagini/aplication.gif", 0, 0, 1440, 800);
-    char opt[3], tasta;
-    int x, y, ok, z;
-    do
-    {
-        readimagefile("Imagini/aplication.gif", 0, 0, 1440, 800);
-        getmouseclick(WM_LBUTTONDOWN, x, y);
-        ok = 0;
-        if (x > 500 && x < 930 && y>570 && y < 675)
-        {
-            aplicatie();
-        }
-    } while (!ok);
-    getch();
-    meniu_1();
-
+	readimagefile("Imagini/aplication.gif", 0, 0, 1440, 800);
+	char opt[3], tasta;  
+	int x, y, ok,z;
+	do
+	{
+		readimagefile("Imagini/aplication.gif", 0, 0, 1440, 800);
+		getmouseclick(WM_LBUTTONDOWN,x,y);
+		ok=0;
+		if (x>500&& x<930 && y>570&& y<675)
+		{
+			aplicatie();
+		}
+		}
+	while(!ok);
+	  getch();
+	  meniu_1();
+	
 }
 int conversie_populatie(const char* pop) {
     return atoi(pop);
@@ -140,7 +157,7 @@ int conversie_populatie(const char* pop) {
 
 void aplicatie() {
     int i, j, nr;
-    setlinestyle(SOLID_LINE, 0, 3);
+	setlinestyle(SOLID_LINE, 0, 3);
     ifstream fis("distanta.txt");
     int nd = 0;
     while (fis >> nr) {
@@ -187,7 +204,7 @@ void aplicatie() {
 
     int x1, y1, x2, y2;
     int click = 0;
-    char orasselect[2][50] = { {0} };
+    char orasselect[2][50] = {{0}};
     char distanta[100];
 
     setbkcolor(WHITE);
@@ -218,8 +235,7 @@ void aplicatie() {
                         outtextxy(10, 680, "Prima alegere este: ");
                         setcolor(RED);
                         outtextxy(235, 680, orasselect[0]);
-                    }
-                    else if (click == 2) {
+                    } else if (click == 2) {
                         outtextxy(10, 700, "A doua alegere este: ");
                         setcolor(RED);
                         outtextxy(235, 700, orasselect[1]);
@@ -250,13 +266,12 @@ void aplicatie() {
                             strcat(dist_text, dist_str);
                             strcat(dist_text, " km");
                             outtextxy(10, 720, dist_text);
-                        }
-                        else {
+                        } else {
                             setcolor(BLACK);
                             outtextxy(10, 720, "Nu s-a putut gasi distanta.");
                         }
                         click = 0;
-                        memset(orasselect, 0, sizeof(orasselect)); // Reset orasselect
+                        memset(orasselect, 0, sizeof(orasselect));
                     }
                 }
             }
@@ -275,9 +290,8 @@ void aplicatie() {
                 outtextxy(10, 30, "Apasa tasta 'q' pentru a iesi");
                 outtextxy(10, 60, "la meniul principal.");
                 click = 0;
-                memset(orasselect, 0, sizeof(orasselect)); // Reset orasselect
-            }
-            else if (ch == 'q') {
+                memset(orasselect, 0, sizeof(orasselect)); 
+            } else if (ch == 'q') {
                 setbkcolor(BLACK);
                 setcolor(WHITE);
                 cleardevice();
@@ -296,66 +310,64 @@ void aplicatie() {
 
 void cupcaut()
 {
-    int x, y, ok = 0;
-    readimagefile("Imagini/cuprinscaut.gif", 0, 0, 1440, 800);
-    while (!ok)
-    {
-
-        if (ismouseclick(WM_MOUSEMOVE))
-        {
-            getmouseclick(WM_MOUSEMOVE, x, y);
-            if (x > 198 && x < 605 && y > 252 && y < 348)
-                readimagefile("Imagini/orashov.gif", 0, 0, 1440, 800);
-            else if (x > 834 && x < 1239 && y > 251 && y < 348)
-                readimagefile("Imagini/judhov.gif", 0, 0, 1440, 800);
-            else if (x > 308 && x < 706 && y > 407 && y < 507)
-                readimagefile("Imagini/pophov.gif", 0, 0, 1440, 800);
-            else if (x > 736 && x < 1136 && y > 408 && y < 500)
-                readimagefile("Imagini/althov.gif", 0, 0, 1440, 800);
-            else if (x > 932 && x < 1337 && y > 601 && y < 696)
-                readimagefile("Imagini/menhov.gif", 0, 0, 1440, 800);
-            else
-                readimagefile("Imagini/cuprinscaut.gif", 0, 0, 1440, 800);
-        }
-        if (ismouseclick(WM_LBUTTONDOWN))
-        {
-            getmouseclick(WM_LBUTTONDOWN, x, y);
-            if (x > 198 && x < 605 && y > 252 && y < 348)
-            {
-                ok = 1;
-                cautare();
-            }
-            if (x > 834 && x < 1239 && y > 251 && y < 348)
-            {
-                ok = 1;
-                cautare_dupa_judet();
-            }
-            if (x > 308 && x < 706 && y > 407 && y < 507)
-            {
-                ok = 1;
-                cautare_dupa_populatie();
-            }
-            if (x > 736 && x < 1136 && y > 408 && y < 500)
-            {
-                ok = 1;
-                cautare_dupa_altitudine();
-            }
-            if (x > 932 && x < 1337 && y > 601 && y < 696)
-            {
-                ok = 1;
-                meniu_1();
-            }
-        }
-    }
-}
+int x, y, ok = 0;
+		readimagefile("Imagini/cuprinscaut.gif", 0,0,1440, 800);
+		while (!ok) 
+		{
+			
+			if (ismouseclick(WM_MOUSEMOVE)) 
+			{
+				getmouseclick(WM_MOUSEMOVE, x, y);
+				if (x > 198 && x < 605 && y > 252&& y < 348) 
+					readimagefile("Imagini/orashov.gif", 0, 0, 1440, 800);
+				else if(x > 834 && x < 1239 && y > 251&& y < 348)
+					readimagefile("Imagini/judhov.gif", 0, 0, 1440, 800);
+				else if(x > 308 && x < 706 && y > 407&& y < 507)
+					readimagefile("Imagini/pophov.gif", 0, 0, 1440, 800);
+				else if(x > 736 && x < 1136 && y > 408 && y < 500)
+					readimagefile("Imagini/althov.gif", 0, 0, 1440, 800);
+				else if(x > 932 && x < 1337 && y > 601 && y < 696)
+					readimagefile("Imagini/menhov.gif", 0, 0, 1440, 800);
+				else
+					readimagefile("Imagini/cuprinscaut.gif", 0,0,1440, 800);
+			 }
+			if (ismouseclick(WM_LBUTTONDOWN)) 
+			{
+				getmouseclick(WM_LBUTTONDOWN, x, y);
+				if (x > 198 && x < 605 && y > 252&& y < 348) 
+				{
+				   ok = 1;
+					cautare();
+				}
+				if (x > 834 && x < 1239 && y > 251&& y < 348) 
+				{
+				   ok = 1;
+				   cautare_dupa_judet();	
+				}
+				if (x > 308 && x < 706 && y > 407&& y < 507)	 
+				{
+				   ok = 1;
+					cautare_dupa_populatie();
+				}
+				if (x > 736 && x < 1136 && y > 408 && y < 500)	 
+				{
+				   ok = 1;
+					cautare_dupa_altitudine();
+				}
+				if (x > 932 && x < 1337 && y > 601 && y < 696) 
+				{
+				   ok = 1;
+					meniu_1();
+				}
+}}}
 
 
 void cautare() {
     cleardevice();
     char nume_oras[30];
-    int x, y, k = 0;
+    int x, y,k=0;
     readimagefile("Imagini/cautareoras.gif", 0, 0, 1440, 800);
-    char caut[50] = ""; // Initializam ?irul de caractere pentru cautare
+    char caut[50] = ""; 
     char lit, folder[100];
     int gasit = 0, poz = -1, i;
 
@@ -388,18 +400,17 @@ void cautare() {
                 if (gasit == 0) {
                     settextstyle(10, 0, 3);
                     outtextxy(642, 700, "Nu am gasit.");
-                    delay(500);
-                    cupcaut();
-                }
-                else {
+					delay(500);
+					cupcaut();
+                } else {
                     cleardevice();
                     settextstyle(10, 0, 5);
 
                     strcpy(folder, "harti/");
                     strcat(folder, e[poz].harta);
                     readimagefile("Imagini/orasgasit.gif", 0, 0, 1440, 800);
-                    setbkcolor(BLACK);
-                    setcolor(WHITE);
+                    setbkcolor(BLACK);  
+                    setcolor(WHITE); 
                     int judet_x1 = 281;
                     int judet_y1 = 241;
                     int judet_x2 = 657;
@@ -475,14 +486,13 @@ void cautare() {
             if (x > cautare_x1 && x < cautare_x2 && y > cautare_y1 && y < cautare_y2) {
                 if (!hover_cautare) {
                     readimagefile("Imagini/cauthov1.gif", 0, 0, 1440, 800);
-                    outtextxy(111, 382, caut);
+					outtextxy(111, 382, caut);
                     hover_cautare = true;
                 }
-            }
-            else {
+            } else {
                 if (hover_cautare) {
                     readimagefile("Imagini/cautareoras.gif", 0, 0, 1440, 800);
-                    outtextxy(111, 382, caut);
+					outtextxy(111, 382, caut);
                     hover_cautare = false;
                 }
             }
@@ -500,20 +510,18 @@ void cautare_dupa_judet() {
     char caut[50] = "";
     char lit;
     int gasit = 0, k = 0, i;
-    int y = 200;
+    int y = 200; 
     int spatiu = 30;
     int j;
     int x, ok;
 
     readimagefile("Imagini/judetcaut.gif", 0, 0, 1440, 800);
-    setbkcolor(WHITE);
-    setcolor(BLACK);
+    setbkcolor(WHITE);  
+    setcolor(BLACK);  
 
     bool hover_cautare = false;
 
-    // Bucla principala pentru gestionarea interactiunii
     while (true) {
-        // Verificare evenimente de la tastatura
         if (kbhit()) {
             lit = getch();
             if (isalpha(lit)) {
@@ -525,26 +533,23 @@ void cautare_dupa_judet() {
             }
         }
 
-        // Verificare evenimente de la mouse
         if (ismouseclick(WM_MOUSEMOVE)) {
             getmouseclick(WM_MOUSEMOVE, x, y);
             if (x > 291 && x < 504 && y > 532 && y < 583) {
                 if (!hover_cautare) {
                     readimagefile("Imagini/judetcauthov.gif", 0, 0, 1440, 800);
-                    outtextxy(111, 382, caut);
+					outtextxy(111, 382, caut);
                     hover_cautare = true;
                 }
-            }
-            else {
+            } else {
                 if (hover_cautare) {
                     readimagefile("Imagini/judetcaut.gif", 0, 0, 1440, 800);
-                    outtextxy(111, 382, caut);
+					outtextxy(111, 382, caut);
                     hover_cautare = false;
                 }
             }
         }
 
-        // Verificare eveniment de click pe butonul de cautare dupa judet
         if (ismouseclick(WM_LBUTTONDOWN)) {
             getmouseclick(WM_LBUTTONDOWN, x, y);
             if (x > 291 && x < 504 && y > 532 && y < 583 && strlen(caut) > 0) {
@@ -555,7 +560,6 @@ void cautare_dupa_judet() {
                 int rezultate[100];
                 int nr_rezultate = 0;
 
-                // Cautare in lista de orase dupa judet
                 for (i = 0; i < n; i++) {
                     if (stricmp(caut, e[i].jud) == 0) {
                         rezultate[nr_rezultate++] = i;
@@ -566,8 +570,8 @@ void cautare_dupa_judet() {
                 if (gasit == 0) {
                     settextstyle(10, 0, 3);
                     outtextxy(642, 700, "Nu am gasit.");
-                    delay(500);
-                    cupcaut();
+					delay(500);
+					cupcaut();
                     return;
                 }
 
@@ -576,11 +580,10 @@ void cautare_dupa_judet() {
                 int total_pagini = (nr_rezultate + rezultate_per_pagina - 1) / rezultate_per_pagina;
                 char pagina[20];
 
-                // Afi?are rezultate pe pagini
                 do {
                     cleardevice();
-                    setbkcolor(BLACK);
-                    setcolor(WHITE);
+                    setbkcolor(BLACK);  
+                    setcolor(WHITE); 
                     readimagefile("Imagini/Afisare2.gif", 0, 0, 1440, 800);
                     itoa(pagina_curenta + 1, pagina, 10);
                     strcat(pagina, "/");
@@ -588,7 +591,6 @@ void cautare_dupa_judet() {
                     outtextxy(1200, 30, pagina);
                     settextstyle(10, 0, 3);
 
-                    // Afi?are rezultate pentru pagina curenta
                     for (j = pagina_curenta * rezultate_per_pagina; j < nr_rezultate && j < (pagina_curenta + 1) * rezultate_per_pagina; j++) {
                         int idx = rezultate[j];
                         int kkk = j % rezultate_per_pagina;
@@ -619,25 +621,22 @@ void cautare_dupa_judet() {
                         readimagefile(folder, imgX1, imgY1, imgX2, imgY2);
                     }
 
-                    // Gestionarea clicurilor de mouse ?i a tastaturii pentru navigare
                     do {
                         getmouseclick(WM_LBUTTONDOWN, x, y);
                         if (x > 240 && x < 300 && y > 5 && y < 65 && pagina_curenta < total_pagini - 1) {
                             pagina_curenta++;
                             break;
-                        }
-                        else if (x > 170 && x < 230 && y > 5 && y < 65 && pagina_curenta > 0) {
+                        } else if (x > 170 && x < 230 && y > 5 && y < 65 && pagina_curenta > 0) {
                             pagina_curenta--;
                             break;
-                        }
-                        else if (x > 80 && x < 140 && y > 5 && y < 65) {
+                        } else if (x > 80 && x < 140 && y > 5 && y < 65) {
                             cupcaut();
                             return;
                         }
 
                         if (kbhit()) {
                             tasta = getch();
-                            if (tasta == 27) {
+                            if (tasta == 27) { 
                                 cupcaut();
                                 return;
                             }
@@ -650,7 +649,6 @@ void cautare_dupa_judet() {
             }
         }
 
-        // Verificare apasare tasta Esc pentru revenire la meniu
         if (kbhit() && lit == char(27)) {
             cupcaut();
             return;
@@ -674,7 +672,6 @@ void cautare_dupa_populatie() {
     setcolor(BLACK);    // Seteaza textul negru
     settextstyle(10, 0, 5);
 
-    // Citirea valorilor minime pentru popula?ie
     k = 0;
     do {
         lit = getch();
@@ -687,7 +684,6 @@ void cautare_dupa_populatie() {
     } while (lit != char(13));
     min_populatie = atoi(caut_min);
 
-    // Citirea valorilor maxime pentru popula?ie
     k = 0;
     do {
         lit = getch();
@@ -700,22 +696,19 @@ void cautare_dupa_populatie() {
     } while (lit != char(13));
     max_populatie = atoi(caut_max);
 
-    // Bucla pentru gestionarea hoverului ?i click-ului pe buton
     bool hover_buton = false;
     do {
         if (ismouseclick(WM_MOUSEMOVE)) {
             getmouseclick(WM_MOUSEMOVE, x, y_click);
 
-            // Verifica hover-ul pe buton
             if (x > 291 && x < 609 && y_click > 530 && y_click < 689) {
                 if (!hover_buton) {
                     readimagefile("Imagini/populhov.gif", 0, 0, 1440, 800);
-                    outtextxy(110, 309, caut_min);
+					outtextxy(110, 309, caut_min);
                     outtextxy(110, 503, caut_max);
                     hover_buton = true;
                 }
-            }
-            else {
+            } else {
                 if (hover_buton) {
                     readimagefile("Imagini/popul.gif", 0, 0, 1440, 800);
                     outtextxy(110, 309, caut_min);
@@ -728,11 +721,9 @@ void cautare_dupa_populatie() {
         if (ismouseclick(WM_LBUTTONDOWN)) {
             getmouseclick(WM_LBUTTONDOWN, x, y_click);
             if (x > 291 && x < 609 && y_click > 530 && y_click < 689) {
-                // Începe cautarea popula?iei
                 gasit = 0;
                 y = 200;
 
-                // Creaza un array pentru stocarea rezultatelor gasite
                 int rezultate[1000];
                 int nr_rezultate = 0;
 
@@ -745,14 +736,13 @@ void cautare_dupa_populatie() {
                 }
 
                 if (gasit == 0) {
-                    settextstyle(10, 0, 3);
+					settextstyle(10, 0, 3);
                     outtextxy(642, 700, "Nu am gasit.");
-                    delay(500);
-                    cupcaut();
+					delay(500);
+					cupcaut();
                     return;
                 }
 
-                // Paginarea rezultatelor gasite
                 int pagina_curenta = 0;
                 int rezultate_per_pagina = 5;
                 int total_pagini = (nr_rezultate + rezultate_per_pagina - 1) / rezultate_per_pagina;
@@ -762,7 +752,7 @@ void cautare_dupa_populatie() {
                     cleardevice();
                     setbkcolor(BLACK);
                     setcolor(WHITE);
-                    settextstyle(10, 0, 3);
+					settextstyle(10, 0, 3);
                     readimagefile("Imagini/Afisare2.gif", 0, 0, 1440, 800);
                     itoa(pagina_curenta + 1, pagina, 10);
                     strcat(pagina, "/");
@@ -800,25 +790,22 @@ void cautare_dupa_populatie() {
                         readimagefile(folder, imgX1, imgY1, imgX2, imgY2);
                     }
 
-                    // Gestionarea clicurilor de mouse ?i a tastaturii
                     do {
                         getmouseclick(WM_LBUTTONDOWN, x, y_click);
                         if (x > 240 && x < 300 && y_click > 5 && y_click < 65 && pagina_curenta < total_pagini - 1) {
                             pagina_curenta++;
                             break;
-                        }
-                        else if (x > 170 && x < 230 && y_click > 5 && y_click < 65 && pagina_curenta > 0) {
+                        } else if (x > 170 && x < 230 && y_click > 5 && y_click < 65 && pagina_curenta > 0) {
                             pagina_curenta--;
                             break;
-                        }
-                        else if (x > 80 && x < 140 && y_click > 5 && y_click < 65) {
+                        } else if (x > 80 && x < 140 && y_click > 5 && y_click < 65) {
                             cupcaut();
                             return;
                         }
 
                         if (kbhit()) {
                             tasta = getch();
-                            if (tasta == 27) {
+                            if (tasta == 27) { 
                                 cupcaut();
                                 return;
                             }
@@ -852,7 +839,6 @@ void cautare_dupa_altitudine() {
     setcolor(BLACK);    // Seteaza textul negru
     settextstyle(10, 0, 5);
 
-    // Citirea valorilor minime pentru altitudine
     k = 0;
     do {
         lit = getch();
@@ -865,7 +851,6 @@ void cautare_dupa_altitudine() {
     } while (lit != char(13));
     min_altitudine = atoi(caut_min);
 
-    // Citirea valorilor maxime pentru altitudine
     k = 0;
     do {
         lit = getch();
@@ -878,22 +863,19 @@ void cautare_dupa_altitudine() {
     } while (lit != char(13));
     max_altitudine = atoi(caut_max);
 
-    // Bucla pentru gestionarea hoverului ?i a click-ului pe buton
     bool hover_buton = false;
     do {
         if (ismouseclick(WM_MOUSEMOVE)) {
             getmouseclick(WM_MOUSEMOVE, x, y_click);
 
-            // Verifica hover-ul pe buton
             if (x > 291 && x < 609 && y_click > 530 && y_click < 689) {
                 if (!hover_buton) {
                     readimagefile("Imagini/altithov.gif", 0, 0, 1440, 800);
-                    outtextxy(110, 309, caut_min);
+					outtextxy(110, 309, caut_min);
                     outtextxy(110, 503, caut_max);
                     hover_buton = true;
                 }
-            }
-            else {
+            } else {
                 if (hover_buton) {
                     readimagefile("Imagini/altit.gif", 0, 0, 1440, 800);
                     outtextxy(110, 309, caut_min);
@@ -906,11 +888,9 @@ void cautare_dupa_altitudine() {
         if (ismouseclick(WM_LBUTTONDOWN)) {
             getmouseclick(WM_LBUTTONDOWN, x, y_click);
             if (x > 291 && x < 609 && y_click > 530 && y_click < 689) {
-                // Începe cautarea dupa altitudine
                 gasit = 0;
                 y = 200;
 
-                // Creaza un array pentru stocarea rezultatelor gasite
                 int rezultate[1000];
                 int nr_rezultate = 0;
 
@@ -923,14 +903,13 @@ void cautare_dupa_altitudine() {
                 }
 
                 if (gasit == 0) {
-                    settextstyle(10, 0, 3);
+					settextstyle(10, 0, 3);
                     outtextxy(642, 700, "Nu am gasit.");
-                    delay(500);
-                    cupcaut();
+					delay(500);
+					cupcaut();
                     return;
                 }
 
-                // Paginarea rezultatelor gasite
                 int pagina_curenta = 0;
                 int rezultate_per_pagina = 5;
                 int total_pagini = (nr_rezultate + rezultate_per_pagina - 1) / rezultate_per_pagina;
@@ -940,7 +919,7 @@ void cautare_dupa_altitudine() {
                     cleardevice();
                     setbkcolor(BLACK);
                     setcolor(WHITE);
-                    settextstyle(10, 0, 3);
+					settextstyle(10, 0, 3);
                     readimagefile("Imagini/Afisare2.gif", 0, 0, 1440, 800);
                     itoa(pagina_curenta + 1, pagina, 10);
                     strcat(pagina, "/");
@@ -978,25 +957,22 @@ void cautare_dupa_altitudine() {
                         readimagefile(folder, imgX1, imgY1, imgX2, imgY2);
                     }
 
-                    // Gestionarea clicurilor de mouse ?i a tastaturii
                     do {
                         getmouseclick(WM_LBUTTONDOWN, x, y_click);
                         if (x > 240 && x < 300 && y_click > 5 && y_click < 65 && pagina_curenta < total_pagini - 1) {
                             pagina_curenta++;
                             break;
-                        }
-                        else if (x > 170 && x < 230 && y_click > 5 && y_click < 65 && pagina_curenta > 0) {
+                        } else if (x > 170 && x < 230 && y_click > 5 && y_click < 65 && pagina_curenta > 0) {
                             pagina_curenta--;
                             break;
-                        }
-                        else if (x > 80 && x < 140 && y_click > 5 && y_click < 65) {
+                        } else if (x > 80 && x < 140 && y_click > 5 && y_click < 65) {
                             cupcaut();
                             return;
                         }
 
                         if (kbhit()) {
                             tasta = getch();
-                            if (tasta == 27) {
+                            if (tasta == 27) { 
                                 cupcaut();
                                 return;
                             }
@@ -1009,13 +985,12 @@ void cautare_dupa_altitudine() {
     } while (true);
 }
 void initializare()
-{
-    int gdriver = DETECT, gmode, errorcode;
-    initwindow(1440, 800, "Orasele Romaniei");
+{ int gdriver = DETECT, gmode, errorcode;
+  initwindow(1440,800,"Orasele Romaniei");
 }
 
 void introducere()
-{
+{ 
     int x = 0;
     int y = 0;
     int latime = 480;
@@ -1026,7 +1001,7 @@ void introducere()
     setcolor(WHITE);
     setlinestyle(SOLID_LINE, 0, 1);
 
-
+    
     for (int r = 0; r <= 2; r++) {
         line(x, y + r * inaltime, x + 3 * latime, y + r * inaltime);
     }
@@ -1035,12 +1010,12 @@ void introducere()
     }
 
     while (true) {
-
+        
         for (int r = 0; r < 2; r++) {
             for (int c = 0; c < 3; c++) {
                 char nume_fisier[20];
                 sprintf(nume_fisier, "Colaj/%d.jpg", (pozitie_curenta + r * 3 + c) % 14 + 1);
-
+                
                 readimagefile(nume_fisier, x + c * latime, y + r * inaltime, x + (c + 1) * latime, y + (r + 1) * inaltime);
 
                 delay(timp_intarziere);
@@ -1052,7 +1027,7 @@ void introducere()
             }
         }
 
-
+        
         for (int r = 0; r <= 2; r++) {
             line(x, y + r * inaltime, x + 3 * latime, y + r * inaltime);
         }
@@ -1062,99 +1037,361 @@ void introducere()
 
         pozitie_curenta = (pozitie_curenta + 6) % 14;
 
-        delay(350);
+      delay(350);
         readimagefile("Imagini/Coperta.jpg", 0, 0, 1440, 800);
         getch();
         motto();
     }
-    setbkcolor(BLACK);
+	setbkcolor(BLACK);
 }
 
 
 void memo()
 {
-    int k = 0;
-    int i;
-    fstream fis("harta.txt", ios::in);
-    for (i = 0; i <= 318; i++)
-    {
-        k++;
-        fis >> e[k].oras;
-        fis >> e[k].jud;
-        fis >> e[k].pop;
-        fis >> e[k].alt;
-        fis >> e[k].harta;
-    }
-    n = k;
+	int k=0;
+	int i;
+	fstream fis("harta.txt",ios::in);
+		for(i=0;i<=318;i++)
+		{
+		k++;
+		fis>>e[k].oras;
+		fis>>e[k].jud;
+		fis>>e[k].pop;
+		fis>>e[k].alt;
+		fis>>e[k].harta;
+	}
+	n=k;
 }
 
 
-void afisareintro()
+void afisareintro() 
 {
 
+int x, y, ok = 0;
+		readimagefile("Imagini/afisorase.gif", 0, 0, 1440, 800);
+		while (!ok) 
+		{
+			if (ismouseclick(WM_MOUSEMOVE)) 
+			{
+				getmouseclick(WM_MOUSEMOVE, x, y);
+				if (x>303&& x<708 && y>253&& y<351) 
+					readimagefile("Imagini/bazhov.gif", 0, 0, 1440, 800);
+				else if(x>734&& x<1144 && y>253 && y<350)
+					readimagefile("Imagini/cauthov.gif", 0, 0, 1440, 800);
+				else if(x>514&& x<925 && y>429 && y<525)
+					readimagefile("Imagini/colajhov.gif", 0, 0, 1440, 800);
+				else if(x > 928 && x < 1338 && y > 603 && y < 697)
+					readimagefile("Imagini/meniuhov.gif", 0, 0, 1440, 800);
+				else 
+					readimagefile("Imagini/afisorase.gif", 0, 0, 1440, 800);
+			 }
+			if (ismouseclick(WM_LBUTTONDOWN)) 
+			{
+				getmouseclick(WM_LBUTTONDOWN, x, y);
+				if (303&& x<708 && y>253&& y<351)
+				{
+				   ok = 1;
+					afis();
+				}
+				if (x>734&& x<1144 && y>253 && y<350) 
+				{
+				   ok = 1;
+				   cupcaut();
+				}
+				if (x>514&& x<925 && y>429 && y<525)	 
+				{
+				   ok = 1;
+					foto();
+				}
+				if (x > 928 && x < 1338 && y > 603 && y < 697)
+				{
+				   ok = 1;
+					meniu_1();
+				}
+}}
+
+}
+
+
+
+void foto()
+{
     int x, y, ok = 0;
-    readimagefile("Imagini/afisorase.gif", 0, 0, 1440, 800);
+    readimagefile("Imagini/colajj.gif", 0, 0, 1440, 800);
     while (!ok)
     {
         if (ismouseclick(WM_MOUSEMOVE))
         {
             getmouseclick(WM_MOUSEMOVE, x, y);
-            if (x > 303 && x < 708 && y>253 && y < 351)
-                readimagefile("Imagini/bazhov.gif", 0, 0, 1440, 800);
-            else if (x > 734 && x < 1144 && y>253 && y < 350)
-                readimagefile("Imagini/cauthov.gif", 0, 0, 1440, 800);
-            else if (x > 514 && x < 925 && y>429 && y < 525)
-                readimagefile("Imagini/colajhov.gif", 0, 0, 1440, 800);
-            else if (x > 928 && x < 1338 && y > 603 && y < 697)
-                readimagefile("Imagini/meniuhov.gif", 0, 0, 1440, 800);
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+                readimagefile("Imagini/colajjhom.gif", 0, 0, 1440, 800);
+            else if (x > 1235 && x < 1309 && y > 93 && y < 163)
+                readimagefile("Imagini/colajjinai.gif", 0, 0, 1440, 800);
             else
-                readimagefile("Imagini/afisorase.gif", 0, 0, 1440, 800);
+                readimagefile("Imagini/colajj.gif", 0, 0, 1440, 800);
         }
         if (ismouseclick(WM_LBUTTONDOWN))
         {
             getmouseclick(WM_LBUTTONDOWN, x, y);
-            if (303 && x < 708 && y>253 && y < 351)
+            if (x > 1235 && x < 1309 && y > 93 && y < 163)
             {
                 ok = 1;
-                afis();
+                foto1();
             }
-            if (x > 734 && x < 1144 && y>253 && y < 350)
-            {
-                ok = 1;
-                cupcaut();
-            }
-            if (x > 514 && x < 925 && y>429 && y < 525)
-            {
-                ok = 1;
-                colajfoto();
-            }
-            if (x > 928 && x < 1338 && y > 603 && y < 697)
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
             {
                 ok = 1;
                 meniu_1();
             }
         }
     }
-
 }
 
-
-
-
-
-
-
-void colajfoto()
+void foto1()
 {
-    cleardevice();
-    readimagefile("Imagini/colaj.gif", 0, 0, 1440, 800);
-    getch();
-    meniu_1();
+    int x, y, ok = 0;
+    readimagefile("Imagini/colajj2.gif", 0, 0, 1440, 800);
+    while (!ok)
+    {
+        if (ismouseclick(WM_MOUSEMOVE))
+        {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj2hom.gif", 0, 0, 1440, 800);
+            else if (x > 1235 && x < 1309 && y > 93 && y < 163)
+                readimagefile("Imagini/colajj2inai.gif", 0, 0, 1440, 800);
+            else if (x > 1077 && x < 1148 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj2inap.gif", 0, 0, 1440, 800);
+            else
+                readimagefile("Imagini/colajj2.gif", 0, 0, 1440, 800);
+        }
+        if (ismouseclick(WM_LBUTTONDOWN))
+        {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x > 1235 && x < 1309 && y > 93 && y < 163)
+            {
+                ok = 1;
+                foto2();
+            }
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+            {
+                ok = 1;
+                meniu_1();
+            }
+            if (x > 1077 && x < 1148 && y > 93 && y < 166)
+            {
+                ok = 1;
+                foto();
+            }
+        }
+    }
+}
+
+void foto2()
+{
+    int x, y, ok = 0;
+    readimagefile("Imagini/colajj3.gif", 0, 0, 1440, 800);
+    while (!ok)
+    {
+        if (ismouseclick(WM_MOUSEMOVE))
+        {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj3hom.gif", 0, 0, 1440, 800);
+            else if (x > 1235 && x < 1309 && y > 93 && y < 163)
+                readimagefile("Imagini/colajj3inai.gif", 0, 0, 1440, 800);
+            else if (x > 1077 && x < 1148 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj3inap.gif", 0, 0, 1440, 800);
+            else
+                readimagefile("Imagini/colajj3.gif", 0, 0, 1440, 800);
+        }
+        if (ismouseclick(WM_LBUTTONDOWN))
+        {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x > 1235 && x < 1309 && y > 93 && y < 163)
+            {
+                ok = 1;
+                foto3();
+            }
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+            {
+                ok = 1;
+                meniu_1();
+            }
+            if (x > 1077 && x < 1148 && y > 93 && y < 166)
+            {
+                ok = 1;
+                foto1();
+            }
+        }
+    }
+}
+
+void foto3()
+{
+    int x, y, ok = 0;
+    readimagefile("Imagini/colajj4.gif", 0, 0, 1440, 800);
+    while (!ok)
+    {
+        if (ismouseclick(WM_MOUSEMOVE))
+        {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj4hom.gif", 0, 0, 1440, 800);
+            else if (x > 1235 && x < 1309 && y > 93 && y < 163)
+                readimagefile("Imagini/colajj4inai.gif", 0, 0, 1440, 800);
+            else if (x > 1077 && x < 1148 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj4inap.gif", 0, 0, 1440, 800);
+            else
+                readimagefile("Imagini/colajj4.gif", 0, 0, 1440, 800);
+        }
+        if (ismouseclick(WM_LBUTTONDOWN))
+        {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x > 1235 && x < 1309 && y > 93 && y < 163)
+            {
+                ok = 1;
+                foto4();
+            }
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+            {
+                ok = 1;
+                meniu_1();
+            }
+            if (x > 1077 && x < 1148 && y > 93 && y < 166)
+            {
+                ok = 1;
+                foto2();
+            }
+        }
+    }
+}
+
+void foto4()
+{
+    int x, y, ok = 0;
+    readimagefile("Imagini/colajj5.gif", 0, 0, 1440, 800);
+    while (!ok)
+    {
+        if (ismouseclick(WM_MOUSEMOVE))
+        {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj5hom.gif", 0, 0, 1440, 800);
+            else if (x > 1235 && x < 1309 && y > 93 && y < 163)
+                readimagefile("Imagini/colajj5inai.gif", 0, 0, 1440, 800);
+            else if (x > 1077 && x < 1148 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj5inap.gif", 0, 0, 1440, 800);
+            else
+                readimagefile("Imagini/colajj5.gif", 0, 0, 1440, 800);
+        }
+        if (ismouseclick(WM_LBUTTONDOWN))
+        {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x > 1235 && x < 1309 && y > 93 && y < 163)
+            {
+                ok = 1;
+                foto5();
+            }
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+            {
+                ok = 1;
+                meniu_1();
+            }
+            if (x > 1077 && x < 1148 && y > 93 && y < 166)
+            {
+                ok = 1;
+                foto3();
+            }
+        }
+    }
+}
+
+void foto5()
+{
+    int x, y, ok = 0;
+    readimagefile("Imagini/colajj6.gif", 0, 0, 1440, 800);
+    while (!ok)
+    {
+        if (ismouseclick(WM_MOUSEMOVE))
+        {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj6hom.gif", 0, 0, 1440, 800);
+            else if (x > 1235 && x < 1309 && y > 93 && y < 163)
+                readimagefile("Imagini/colajj6inai.gif", 0, 0, 1440, 800);
+            else if (x > 1077 && x < 1148 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj6inap.gif", 0, 0, 1440, 800);
+            else
+                readimagefile("Imagini/colajj6.gif", 0, 0, 1440, 800);
+        }
+        if (ismouseclick(WM_LBUTTONDOWN))
+        {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x > 1235 && x < 1309 && y > 93 && y < 163)
+            {
+                ok = 1;
+                foto6();
+            }
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+            {
+                ok = 1;
+                meniu_1();
+            }
+            if (x > 1077 && x < 1148 && y > 93 && y < 166)
+            {
+                ok = 1;
+                foto4();
+            }
+        }
+    }
+}
+
+void foto6()
+{
+    int x, y, ok = 0;
+    readimagefile("Imagini/colajj7.gif", 0, 0, 1440, 800);
+    while (!ok)
+    {
+        if (ismouseclick(WM_MOUSEMOVE))
+        {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj7hom.gif", 0, 0, 1440, 800);
+            else if (x > 1235 && x < 1309 && y > 93 && y < 163)
+                readimagefile("Imagini/colajj7inai.gif", 0, 0, 1440, 800);
+            else if (x > 1077 && x < 1148 && y > 93 && y < 166)
+                readimagefile("Imagini/colajj7inap.gif", 0, 0, 1440, 800);
+            else
+                readimagefile("Imagini/colajj7.gif", 0, 0, 1440, 800);
+        }
+        if (ismouseclick(WM_LBUTTONDOWN))
+        {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x > 1235 && x < 1309 && y > 93 && y < 163)
+            {
+                ok = 1;
+                foto();
+            }
+            if (x > 1154 && x < 1227 && y > 93 && y < 166)
+            {
+                ok = 1;
+                meniu_1();
+            }
+            if (x > 1077 && x < 1148 && y > 93 && y < 166)
+            {
+                ok = 1;
+                foto5();
+            }
+        }
+    }
 }
 
 
 
-int meniuapas = 0; // variabila pentru a verifica daca s-a apasat tasta pentru meniu
+
+
+int meniuapas = 0; 
 
 void afis()
 {
@@ -1165,8 +1402,8 @@ void afis()
     int x, y, ok;
 
     settextstyle(10, 0, 3);
-    setbkcolor(BLACK);
-    setcolor(WHITE);
+	setbkcolor(BLACK);
+	setcolor(WHITE);
     readimagefile("Imagini/Afisare.gif", 0, 0, 1440, 800);
 
     do {
@@ -1211,59 +1448,49 @@ void afis()
             if (x > 240 && x < 300 && y > 5 && y < 65) {
                 i += 5;
                 break;
-            }
-            else if (x > 170 && x < 230 && y > 5 && y < 65 && i > 0) {
+            } else if (x > 170 && x < 230 && y > 5 && y < 65 && i > 0) {
                 i -= 5;
                 break;
-            }
-            else if (x > 80 && x < 140 && y > 5 && y < 65) {
+            } else if (x > 80 && x < 140 && y > 5 && y < 65) {
                 meniu_1();
                 return;
-            }
-            else if (x > 300 && x < 333 && y > 70 && y < 97) {
+            } else if (x > 300 && x < 333 && y > 70 && y < 97) {
                 sortare_crescator_oras();
-                i = 0;
+                i = 0; 
                 break;
-            }
-            else if (x > 300 && x < 330 && y > 102 && y < 127) {
+            } else if (x > 300 && x < 330 && y > 102 && y < 127) {
                 sortare_descrescator_oras();
-                i = 0;
+                i = 0; 
                 break;
-            }
-            else if (x > 635 && x < 666 && y > 72 && y < 98) {
+            } else if (x > 635 && x < 666 && y > 72 && y < 98) {
                 sortare_crescator_judet();
-                i = 0;
+                i = 0; 
                 break;
-            }
-            else if (x > 634 && x < 664 && y > 103 && y < 128) {
+            } else if (x > 634 && x < 664 && y > 103 && y < 128) {
                 sortare_descrescator_judet();
                 i = 0;
                 break;
-            }
-            else if (x > 909 && x < 940 && y > 71 && y < 97) {
+            } else if (x > 909 && x < 940 && y > 71 && y < 97) {
                 sortare_crescator_populatie();
-                i = 0;
+                i = 0; 
                 break;
-            }
-            else if (x > 910 && x < 940 && y > 102 && y < 127) {
+            } else if (x > 910 && x < 940 && y > 102 && y < 127) {
                 sortare_descrescator_populatie();
-                i = 0;
+                i = 0; 
                 break;
-            }
-            else if (x > 1136 && x < 1168 && y > 71 && y < 97) {
+            } else if (x > 1136 && x < 1168 && y > 71 && y < 97) {
                 sortare_crescator_altitudine();
-                i = 0;
+                i = 0; 
                 break;
-            }
-            else if (x > 1136 && x < 1167 && y > 102 && y < 127) {
+            } else if (x > 1136 && x < 1167 && y > 102 && y < 127) {
                 sortare_descrescator_altitudine();
-                i = 0;
+                i = 0; 
                 break;
             }
 
             if (kbhit()) {
                 tasta = getch();
-                if (tasta == 27) {
+                if (tasta == 27) { 
                     meniu_1();
                     return;
                 }
@@ -1273,7 +1500,7 @@ void afis()
         kkk = 0;
         cleardevice();
         readimagefile("Imagini/Afisare.gif", 0, 0, 1440, 800);
-    } while (!kbhit());
+    } while (!kbhit()); 
 }
 
 void sortare_crescator_oras()
@@ -1310,7 +1537,7 @@ void sortare_descrescator_oras()
     } while (ok);
 }
 
-void sortare_crescator_judet()
+	void sortare_crescator_judet()
 {
     int ok, ii;
     orase inv;
@@ -1345,33 +1572,33 @@ void sortare_descrescator_judet()
 }
 
 void sortare_crescator_populatie()
-{
-    int ok = 0, ii;
+{ 
+    int ok=0,ii;
     orase inv;
     do {
-        ok = 0;
-        for (ii = 0; ii < n - 1; ii++) {
-            if (atoi(e[ii].pop) > atoi(e[ii + 1].pop)) {
-                inv = e[ii];
-                e[ii] = e[ii + 1];
-                e[ii + 1] = inv;
-                ok = 1;
+        ok=0;
+        for (ii=0; ii<n-1; ii++) {
+            if (atoi(e[ii].pop) > atoi(e[ii+1].pop)) {
+                inv=e[ii];
+                e[ii]=e[ii+1];
+                e[ii+1]=inv;
+                ok=1;
             }
         }
     } while (ok);
 }
 void sortare_descrescator_populatie()
-{
-    int ok = 0, ii;
+{ 
+    int ok=0,ii;
     orase inv;
     do {
-        ok = 0;
-        for (ii = 1; ii < n - 1; ii++) {
-            if (atoi(e[ii].pop) < atoi(e[ii + 1].pop)) {
-                inv = e[ii];
-                e[ii] = e[ii + 1];
-                e[ii + 1] = inv;
-                ok = 1;
+        ok=0;
+        for (ii=1; ii<n-1; ii++) {
+            if (atoi(e[ii].pop) < atoi(e[ii+1].pop)) {
+                inv=e[ii];
+                e[ii]=e[ii+1];
+                e[ii+1]=inv;
+                ok=1;
             }
         }
     } while (ok);
@@ -1379,160 +1606,198 @@ void sortare_descrescator_populatie()
 
 
 void sortare_crescator_altitudine()
-{
-    int ok = 0, ii;
+{ 
+    int ok=0,ii;
     orase inv;
     do {
-        ok = 0;
-        for (ii = 0; ii < n - 1; ii++) {
-            if (atoi(e[ii].alt) > atoi(e[ii + 1].alt)) {
-                inv = e[ii];
-                e[ii] = e[ii + 1];
-                e[ii + 1] = inv;
-                ok = 1;
+        ok=0;
+        for (ii=0; ii<n-1; ii++) {
+            if (atoi(e[ii].alt) > atoi(e[ii+1].alt)) {
+                inv=e[ii];
+                e[ii]=e[ii+1];
+                e[ii+1]=inv;
+                ok=1;
             }
         }
     } while (ok);
 }
 
 void sortare_descrescator_altitudine()
-{
-    int ok = 0, ii;
+{ 
+    int ok=0,ii;
     orase inv;
     do {
-        ok = 0;
-        for (ii = 0; ii < n - 1; ii++) {
-            if (atoi(e[ii].alt) < atoi(e[ii + 1].alt)) {
-                inv = e[ii];
-                e[ii] = e[ii + 1];
-                e[ii + 1] = inv;
-                ok = 1;
+        ok=0;
+        for (ii=0; ii<n-1; ii++) {
+            if (atoi(e[ii].alt) < atoi(e[ii+1].alt)) {
+                inv=e[ii];
+                e[ii]=e[ii+1];
+                e[ii+1]=inv;
+                ok=1;
             }
         }
     } while (ok);
 }
-
-void meniu_1()
-{
+	
+void meniu_1() {
     int x, y, ok = 0;
-    readimagefile("Imagini/Cuprins.gif", 0, 0, 1440, 800);
-    while (!ok)
-    {
+    if (inregistrat == 0) {
+        readimagefile("Imagini/Cuprins.gif", 0, 0, 1440, 800);
+    } else {
+        readimagefile("Imagini/meniuinreg.gif", 0, 0, 1440, 800);
+    }
 
-        if (ismouseclick(WM_MOUSEMOVE))
-        {
+    while (!ok) {
+        if (ismouseclick(WM_MOUSEMOVE)) {
             getmouseclick(WM_MOUSEMOVE, x, y);
-            if (x > 146 && x < 547 && y > 247 && y < 341)
-                readimagefile("Imagini/intr.gif", 0, 0, 1440, 800);
-            else if (x > 146 && x < 545 && y > 400 && y < 495)
-                readimagefile("Imagini/baz.gif", 0, 0, 1440, 800);
-            else if (x > 146 && x < 545 && y > 562 && y < 656)
-                readimagefile("Imagini/cun.gif", 0, 0, 1440, 800);
-            else if (x > 897 && x < 1292 && y > 248 && y < 341)
-                readimagefile("Imagini/bib.gif", 0, 0, 1440, 800);
-            else if (x > 897 && x < 1292 && y > 402 && y < 495)
-                readimagefile("Imagini/str.gif", 0, 0, 1440, 800);
-            else if (x > 897 && x < 1292 && y > 564 && y < 656)
-                readimagefile("Imagini/aut.gif", 0, 0, 1440, 800);
-            else if (x > 1033 && x < 1195 && y > 98 && y < 130)
-                readimagefile("Imagini/inreg.gif", 0, 0, 1440, 800);
-            else if (x > 1211 && x < 1349 && y > 105 && y < 125)
-                readimagefile("Imagini/aute.gif", 0, 0, 1440, 800);
-            else if (x > 128 && x < 188 && y > 76 && y < 158)
-                readimagefile("Imagini/ies.gif", 0, 0, 1440, 800);
-            else if (x > 205 && x < 263 && y > 91 && y < 144)
-                readimagefile("Imagini/inf.gif", 0, 0, 1440, 800);
-            else
-                readimagefile("Imagini/Cuprins.gif", 0, 0, 1440, 800);
+            if (x > 146 && x < 547 && y > 247 && y < 341) {
+                if (inregistrat == 1 ) {
+                    readimagefile("Imagini/intradm.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/intr.gif", 0, 0, 1440, 800);
+                }
+            } else if (x > 146 && x < 545 && y > 400 && y < 495) {
+                if (inregistrat == 1) {
+                    readimagefile("Imagini/bazadm.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/baz.gif", 0, 0, 1440, 800);
+                }
+            } else if (x > 146 && x < 545 && y > 562 && y < 656) {
+                if (inregistrat == 1 ) {
+                    readimagefile("Imagini/cunosadm.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/cun.gif", 0, 0, 1440, 800);
+                }
+            } else if (x > 897 && x < 1292 && y > 248 && y < 341) {
+                if (inregistrat == 1 ) {
+                    readimagefile("Imagini/bibladm.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/bib.gif", 0, 0, 1440, 800);
+                }
+            } else if (x > 897 && x < 1292 && y > 402 && y < 495) {
+                if (inregistrat == 1) {
+                    readimagefile("Imagini/structadm.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/str.gif", 0, 0, 1440, 800);
+                }
+            } else if (x > 897 && x < 1292 && y > 564 && y < 656) {
+                if (inregistrat == 1 ) {
+                    readimagefile("Imagini/bioadm.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/aut.gif", 0, 0, 1440, 800);
+                }
+            } else if (x > 1033 && x < 1195 && y > 98 && y < 130) {
+                if (inregistrat == 1 ) {
+                    readimagefile("Imagini/meniudec.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/inreg.gif", 0, 0, 1440, 800);
+                }
+            } else if (x > 1211 && x < 1349 && y > 105 && y < 125) {
+                if (inregistrat == 1 ) {
+                    readimagefile("Imagini/meniuadm.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/aute.gif", 0, 0, 1440, 800);
+                }
+            } else if (x > 128 && x < 188 && y > 76 && y < 158) {
+                if (inregistrat == 1 ) {
+                    readimagefile("Imagini/iesadm.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/ies.gif", 0, 0, 1440, 800);
+                }
+            } else if (x > 205 && x < 263 && y > 91 && y < 144) {
+                if (inregistrat == 1 ) {
+                    readimagefile("Imagini/infadm.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/inf.gif", 0, 0, 1440, 800);
+                }
+            } else {
+                if (inregistrat == 0) {
+                    readimagefile("Imagini/Cuprins.gif", 0, 0, 1440, 800);
+                } else {
+                    readimagefile("Imagini/meniuinreg.gif", 0, 0, 1440, 800);
+                }
+            }
         }
-        if (ismouseclick(WM_LBUTTONDOWN))
-        {
+
+        if (ismouseclick(WM_LBUTTONDOWN)) {
             getmouseclick(WM_LBUTTONDOWN, x, y);
-            if (x > 146 && x < 547 && y > 247 && y < 341)
-            {
+            if (x > 146 && x < 547 && y > 247 && y < 341) {
                 ok = 1;
                 intro();
             }
-            if (x > 146 && x < 545 && y > 400 && y < 495)
-            {
+            if (x > 146 && x < 545 && y > 400 && y < 495) {
                 ok = 1;
                 afisareintro();
             }
-            if (x > 146 && x < 545 && y > 562 && y < 656)
-            {
+            if (x > 146 && x < 545 && y > 562 && y < 656) {
                 ok = 1;
                 cunostinte();
             }
-            if (x > 897 && x < 1292 && y > 248 && y < 341)
-            {
+            if (x > 897 && x < 1292 && y > 248 && y < 341) {
                 ok = 1;
                 bibl();
             }
-            if (x > 897 && x < 1292 && y > 402 && y < 495)
-            {
+            if (x > 897 && x < 1292 && y > 402 && y < 495) {
                 ok = 1;
                 structura();
             }
-            if (x > 897 && x < 1292 && y > 564 && y < 656)
-            {
+            if (x > 897 && x < 1292 && y > 564 && y < 656) {
                 ok = 1;
                 autor();
             }
-            if (x > 1033 && x < 1195 && y > 98 && y < 130)
-            {
-                ok = 1;
-                if (inregistrat == 0)
-                {
+            if (x > 1033 && x < 1195 && y > 98 && y < 130) {
+                if (inregistrat == 1) {
+                    inregistrat = 0;
+                    ok = 1;
+                    meniu_1();
+                } else {
+                    ok = 1;
                     inregis();
                 }
-                else
-                {
+            }
+            if (x > 1211 && x < 1349 && y > 105 && y < 125) {
+				if (inregistrat == 0){
+					autentificare();
+				}
+                if (inregistrat == 1 && adminn == 1) {
+                    ok = 1;
+                    administrare();
+                } else {
+                    ok = 1;
                     meniu_1();
                 }
             }
-            if (x > 1211 && x < 1349 && y > 105 && y < 125)
-            {
-                ok = 1;
-                if (inregistrat == 0)
-                {
-                    autentificare();
-                }
-                else
-                {
-                    meniu_1();
-                }
-            }
-            if (x > 128 && x < 188 && y > 76 && y < 158)
-            {
+            if (x > 128 && x < 188 && y > 76 && y < 158) {
                 ok = 1;
                 exit(0);
             }
-            if (x > 205 && x < 263 && y > 91 && y < 144)
-            {
+            if (x > 205 && x < 263 && y > 91 && y < 144) {
                 ok = 1;
                 system("notepad.exe README.txt");
             }
-
         }
     }
-    readimagefile("Imagini/Cuprins.gif", 0, 0, 1440, 800);
+    if (inregistrat == 0) {
+        readimagefile("Imagini/Cuprins.gif", 0, 0, 1440, 800);
+    } else {
+        readimagefile("Imagini/meniuinreg.gif", 0, 0, 1440, 800);
+    }
     cleardevice();
     meniu_1();
 }
 
 
-
 void inregis() {
     char numuser[99][20], usernou[20], pass1[12], pass2[12], lit;
-    int x, y, i, ok = 1, k = 0; // ok verifica daca userul nou exista în fi?ierul ini?ial cu useri
-    int nume = 0; // schimbat numele
+    int x, y, i, ok = 1, k = 0; 
+    int nume = 0;
 
     usernou[0] = '\0';
     readimagefile("Imagini/inregistrare.gif", 0, 0, 1440, 800);
     setcolor(BLACK);
-    setbkcolor(WHITE);
+	setbkcolor(WHITE);
     settextstyle(10, 0, 4);
-
+	
 
     do {
         if (kbhit()) {
@@ -1545,16 +1810,14 @@ void inregis() {
             outtextxy(790, 250, usernou);
         }
 
-        // Verificare hover ?i clic pe buton
         if (ismouseclick(WM_MOUSEMOVE)) {
             getmouseclick(WM_MOUSEMOVE, x, y);
             if (x > 94 && x < 183 && y > 79 && y < 156) {
                 readimagefile("Imagini/inregistrarehov.gif", 0, 0, 1440, 800);
-                outtextxy(790, 250, usernou); // Reafi?am textul introdus
-            }
-            else {
+				outtextxy(790, 250, usernou); 
+            } else {
                 readimagefile("Imagini/inregistrare.gif", 0, 0, 1440, 800);
-                outtextxy(790, 250, usernou); // Reafi?am textul introdus
+                outtextxy(790, 250, usernou); 
             }
         }
 
@@ -1564,7 +1827,7 @@ void inregis() {
                 meniu_1();
             }
         }
-    } while (lit != char(13)); // Codul ASCII 13 este pentru tasta Enter
+    } while (lit != char(13)); 
 
     verific_user(usernou);
 }
@@ -1577,7 +1840,7 @@ void intro() {
     int latime_mica = (x2 - x1) / 2;
     int inaltime_mica = (y2 - y1) / 2;
 
-    char imagini_mici[12][20] = { "Colaj/7.jpg", "Colaj/8.jpg", "Colaj/9.jpg", "Colaj/10.jpg", "Colaj/11.jpg", "Colaj/12.jpg", "Colaj/13.jpg", "Colaj/14.jpg", "Colaj/15.jpg", "Colaj/16.jpg", "Colaj/17.jpg", "Colaj/18.jpg" };
+    char imagini_mici[12][20] = {"Colaj/7.jpg", "Colaj/8.jpg", "Colaj/9.jpg", "Colaj/10.jpg", "Colaj/11.jpg", "Colaj/12.jpg", "Colaj/13.jpg", "Colaj/14.jpg", "Colaj/15.jpg", "Colaj/16.jpg", "Colaj/17.jpg", "Colaj/18.jpg"};
 
     readimagefile("Imagini/intro1.gif", 0, 0, 1440, 800);
     rectangle(x1, y1, x2, y2);
@@ -1587,13 +1850,13 @@ void intro() {
     line((x1 + x2) / 2, y1, (x1 + x2) / 2, y2);
 
     for (int j = 0; j < 4; j++) {
-        readimagefile(imagini_mici[j], x1 + (j % 2) * latime_mica, y1 + (j / 2) * inaltime_mica,
-            x1 + (j % 2 + 1) * latime_mica, y1 + (j / 2 + 1) * inaltime_mica);
+        readimagefile(imagini_mici[j], x1 + (j % 2) * latime_mica, y1 + (j / 2) * inaltime_mica, 
+                      x1 + (j % 2 + 1) * latime_mica, y1 + (j / 2 + 1) * inaltime_mica);
         delay(500);
     }
     readimagefile("Imagini/intro2.gif", 0, 0, 1440, 800);
 
-    char opt[3], tasta;
+    char opt[3], tasta;  
     int x, y, ok = 0;
     bool hover_hom = false;
     bool hover_dr = false;
@@ -1609,16 +1872,14 @@ void intro() {
                     hover_hom = true;
                     hover_dr = false;
                 }
-            }
-            else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
+            } else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
                 if (!hover_dr) {
                     readimagefile("Imagini/intro1dr.gif", 0, 0, 1440, 800);
 
                     hover_hom = false;
                     hover_dr = true;
                 }
-            }
-            else {
+            } else {
                 if (hover_hom || hover_dr) {
                     readimagefile("Imagini/intro2.gif", 0, 0, 1440, 800);
                     hover_hom = false;
@@ -1632,8 +1893,7 @@ void intro() {
             if (x > 1160 && x < 1230 && y > 94 && y < 162) {
                 meniu_1();
                 return;
-            }
-            else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
+            } else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
                 introdoi();
                 ok = 1;
             }
@@ -1647,10 +1907,10 @@ void intro() {
 
 
 
-
+	
 
 void introdoi() {
-    char opt[3], tasta;
+    char opt[3], tasta;  
     int x, y, ok = 0;
     bool hover_st = false;
     bool hover_dr = false;
@@ -1668,16 +1928,14 @@ void introdoi() {
                     hover_st = true;
                     hover_dr = false;
                 }
-            }
-            else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
+            } else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
                 if (!hover_dr) {
                     readimagefile("Imagini/introo2dr.gif", 0, 0, 1440, 800);
 
                     hover_st = false;
                     hover_dr = true;
                 }
-            }
-            else {
+            } else {
                 if (hover_st || hover_dr) {
                     readimagefile("Imagini/introo2.gif", 0, 0, 1440, 800);
                     hover_st = false;
@@ -1691,8 +1949,7 @@ void introdoi() {
             if (x > 1160 && x < 1230 && y > 94 && y < 162) {
                 intro();
                 return;
-            }
-            else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
+            } else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
                 introtrei();
                 return;
             }
@@ -1710,7 +1967,7 @@ void introdoi() {
 }
 
 void introtrei() {
-    char opt[3], tasta;
+    char opt[3], tasta;  
     int x, y, ok = 0;
     bool hover_st = false;
     bool hover_hom = false;
@@ -1728,16 +1985,14 @@ void introtrei() {
                     hover_st = true;
                     hover_hom = false;
                 }
-            }
-            else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
+            } else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
                 if (!hover_hom) {
                     readimagefile("Imagini/intro3hom.gif", 0, 0, 1440, 800);
 
                     hover_st = false;
                     hover_hom = true;
                 }
-            }
-            else {
+            } else {
                 if (hover_st || hover_hom) {
                     readimagefile("Imagini/intro3.gif", 0, 0, 1440, 800);
                     hover_st = false;
@@ -1751,8 +2006,7 @@ void introtrei() {
             if (x > 1160 && x < 1230 && y > 94 && y < 162) {
                 introdoi();
                 return;
-            }
-            else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
+            } else if (x > 1235 && x < 1306 && y > 95 && y < 162) {
                 meniu_1();
                 return;
             }
@@ -1773,51 +2027,41 @@ void introtrei() {
 void cunostinte() {
     char opt[3], tasta;
     int x, y, ok = 0;
-    int mouse_x, mouse_y; // Variabile pentru coordonatele mouse-ului
+    int mouse_x, mouse_y; 
 
     readimagefile("Imagini/cunostinte.gif", 0, 0, 1440, 800);
 
     while (!ok) {
-        // Verificam daca s-a facut click pe mouse
         if (ismouseclick(WM_LBUTTONDOWN)) {
             getmouseclick(WM_LBUTTONDOWN, x, y);
 
-            // Verificam pozi?ia cursorului ?i ac?ionam în func?ie de butonul apasat
             if (x > 307 && x < 704 && y > 263 && y < 365) {
                 ok = 1;
-                memo_dist(); // Apelam func?ia corespunzatoare
-            }
-            else if (x > 734 && x < 1170 && y > 263 && y < 365) {
+                memo_dist(); 
+            } else if (x > 734 && x < 1170 && y > 263 && y < 365) {
                 ok = 1;
-                quiz(); // Apelam func?ia corespunzatoare
-            }
-            else if (x > 516 && x < 922 && y > 422 && y < 515) {
+                quiz(); 
+            } else if (x > 516 && x < 922 && y > 422 && y < 515) {
                 ok = 1;
-                meniu_1(); // Apelam func?ia corespunzatoare
+                meniu_1(); 
             }
         }
 
-        // Verificam mi?carea mouse-ului pentru afi?area imaginilor de hover
         if (ismouseclick(WM_MOUSEMOVE)) {
             getmouseclick(WM_MOUSEMOVE, mouse_x, mouse_y);
 
-            // Verificam pozi?ia cursorului ?i afi?am imaginea corespunzatoare
             if (mouse_x > 307 && mouse_x < 704 && mouse_y > 263 && mouse_y < 365) {
                 readimagefile("Imagini/aplhov.gif", 0, 0, 1440, 800);
-            }
-            else if (mouse_x > 734 && mouse_x < 1170 && mouse_y > 263 && mouse_y < 365) {
+            } else if (mouse_x > 734 && mouse_x < 1170 && mouse_y > 263 && mouse_y < 365) {
                 readimagefile("Imagini/quizzhov.gif", 0, 0, 1440, 800);
-            }
-            else if (mouse_x > 516 && mouse_x < 922 && mouse_y > 422 && mouse_y < 515) {
+            } else if (mouse_x > 516 && mouse_x < 922 && mouse_y > 422 && mouse_y < 515) {
                 readimagefile("Imagini/menhovv.gif", 0, 0, 1440, 800);
-            }
-            else {
-                // Daca cursorul nu este deasupra niciunui buton, afi?am imaginea principala
+            } else {
+
                 readimagefile("Imagini/cunostinte.gif", 0, 0, 1440, 800);
             }
         }
 
-        // Verificam apasarea tastei Esc pentru a reveni la meniu_1()
         if (kbhit()) {
             tasta = getch();
             if (tasta == 27) {
@@ -1887,6 +2131,7 @@ void citintreb() {
     aleatoriu();
     int x, y, ok = 0;
     readimagefile("Imagini/quizincep.gif", 0, 0, 1440, 800);
+	cout<<endl<<user;
     do {
         getmouseclick(WM_LBUTTONDOWN, x, y);
         if (x > 495 && x < 925 && y > 575 && y < 680) {
@@ -1901,13 +2146,13 @@ int afis_intreb(char nume_fis_intreb[33], char var_corecta[3]) {
     readimagefile(nume_fis_intreb, 0, 0, 1440, 800);
     do {
         getmouseclick(WM_LBUTTONDOWN, x, y);
-        if (x > 210 && x < 590 && y > 380 && y < 465)
+        if (x > 183 && x < 590 && y > 350 && y < 465)
             aleg = '1';
-        else if (x > 845 && x < 1230 && y > 380 && y < 465)
+        else if (x > 845 && x < 1262 && y > 380 && y < 465)
             aleg = '2';
-        else if (x > 210 && x < 590 && y > 560 && y < 645)
+        else if (x > 180 && x < 590 && y > 545 && y < 645)
             aleg = '3';
-        else if (x > 845 && x < 1225 && y > 560 && y < 645)
+        else if (x > 845 && x < 1265 && y > 560 && y < 645)
             aleg = '4';
     } while (aleg == '0');
 
@@ -1915,8 +2160,7 @@ int afis_intreb(char nume_fis_intreb[33], char var_corecta[3]) {
         readimagefile("Imagini/corect.gif", 0, 0, 1440, 800);
         delay(1200);
         return 1;
-    }
-    else {
+    } else {
         readimagefile("Imagini/gresit.gif", 0, 0, 1440, 800);
         delay(1200);
         return 0;
@@ -1924,81 +2168,75 @@ int afis_intreb(char nume_fis_intreb[33], char var_corecta[3]) {
 }
 
 int quiz() {
-    if (inregistrat == 0)
-    {
-        readimagefile("neinreg.jpg", 0, 0, 1440, 800);
-        delay(1000);
-        inregis();
+	if(inregistrat==0)
+	{
+		 readimagefile("Imagini/neinreg.gif", 0, 0, 1440, 800);
+		 
+		delay(3000);
+		meniu_1();
+	}
+		else {
+    Intrebare intreb[66];
+    int k = 0;
+
+    ifstream fi("Quiz/quiz.txt");
+    if (!fi) {
+        cerr << "Nu pot deschide fisierul Quiz/quiz.txt" << endl;
+        return 1;
     }
-    else {
-        Intrebare intreb[66];
-        int k = 0;
 
-        ifstream fi("Quiz/quiz.txt");
-        if (!fi) {
-            cerr << "Nu pot deschide fisierul Quiz/quiz.txt" << endl;
-            return 1;
-        }
-
-        while (fi >> intreb[k].numar >> intreb[k].foto >> intreb[k].corect) {
-            k++;
-        }
-        fi.close();
-
-        citintreb();
-
-        int corecte = 0, gresite = 0;
-        for (int i = 0; i < k; i++) {
-            int rezultat = afis_intreb(intreb[i].foto, intreb[i].corect);
-            if (rezultat == 1)
-                corecte++;
-            else
-                gresite++;
-        }
-
-        afisconcl(corecte, gresite);
-
-        closegraph();
-        return 0;
+    while (fi >> intreb[k].numar >> intreb[k].foto >> intreb[k].corect) {
+        k++;
     }
+    fi.close();
+
+    citintreb();
+
+    int corecte = 0, gresite = 0;
+    for (int i = 0; i < k; i++) {
+        int rezultat = afis_intreb(intreb[i].foto, intreb[i].corect);
+        if (rezultat == 1)
+            corecte++;
+        else
+            gresite++;
+    }
+
+    afisconcl(corecte, gresite);
+
+    closegraph();
+    return 0;
+	}
 }
+
+
+struct LeaderboardEntry {
+    char user[33];
+    int score;
+};
 
 
 
 void afisconcl(int corecte, int gresite) {
     fstream rezultate("rezultate.txt", ios::out);
-    rezultate << "			Ai terminat quizul!	" << endl;
+    rezultate << "			Ai terminat quizul!	"  << endl;
     rezultate << "		Mai jos vezi raspunsurile tale:	" << endl << endl;
     rezultate << "Raspunsuri corecte: " << corecte << endl;
     rezultate << "Raspunsuri gresite: " << gresite << endl;
     rezultate.close();
 
-    char s_corecte[3], s_gresite[3];
+    updateLeaderboard(user, corecte);
 
-    cleardevice();
-    setcolor(2);
-    settextstyle(10, 0, 4);
-    readimagefile("Imagini/quizfoto.gif", 0, 0, 1440, 800);
-    itoa(corecte, s_corecte, 10);
-    itoa(gresite, s_gresite, 10);
-    setcolor(GREEN);
-    outtextxy(765, 250, s_corecte);
-    setcolor(RED);
-    outtextxy(765, 295, s_gresite);
-    setcolor(BLACK);
-    char opt[3], tasta;
-    int x, y, ok, z;
-    system("notepad.exe rezultate.txt");
-    do
-    {
+    displayLeaderboard(corecte, gresite);
+
+    char opt[3];
+    int x, y, ok;
+    do {
         getmouseclick(WM_LBUTTONDOWN, x, y);
         ok = 0;
-        if (x > 360 && x < 708 && y>605 && y < 690)
-        {
+        if (x > 88 && x < 415 && y > 595 && y < 673) {
             meniu_1();
         }
-        if (x > 735 && x < 1079 && y>608 && y < 690)
-        {
+        if (x > 429 && x < 758 && y > 593 && y < 673) {
             cleardevice();
             cunostinte();
         }
@@ -2007,78 +2245,222 @@ void afisconcl(int corecte, int gresite) {
     meniu_1();
 }
 
-void bibl()
-{
-    cleardevice();
-    settextstyle(6, 0, 3);
-    readimagefile("Imagini/bibliografie.gif", 0, 0, 1440, 800);
-    getch();
-    meniu_1();
+void updateLeaderboard(const char* user, int score) {
+    LeaderboardEntry entries[100];
+    int count = 0;
+    
+    ifstream file("leaderboard.txt");
+    if (file.is_open()) {
+        while (file >> entries[count].user >> entries[count].score) {
+            count++;
+        }
+        file.close();
+    }
+
+    strcpy(entries[count].user, user);
+    entries[count].score = score;
+    count++;
+
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = i + 1; j < count; j++) {
+            if (entries[i].score < entries[j].score) {
+                LeaderboardEntry temp = entries[i];
+                entries[i] = entries[j];
+                entries[j] = temp;
+            }
+        }
+    }
+
+    ofstream outfile("leaderboard.txt");
+    for (int i = 0; i < std::min(count, 6); i++) {
+        outfile << entries[i].user << " " << entries[i].score << endl;
+    }
+    outfile.close();
+}
+
+void displayLeaderboard(int corecte, int gresite) {
+    ifstream file("leaderboard.txt");
+    char user[33];
+    int score;
+    
+    cleardevice();     
+	readimagefile("Imagini/quizfoto.gif", 0, 0, 1440, 800); 
+
+    setbkcolor(WHITE); 
+    setcolor(BLACK);
+    settextstyle(10, 0, 4);
+
+    
+    int startXUser = 936;
+    int startXScore = 1272;
+    int startYUser = 290; 
+    int startYScore = 290; 
+    int lineSpacing = 69; 
+
+    int yUser = startYUser;
+    int yScore = startYScore;
+
+    int count = 0; 
+
+    while (file >> user >> score) {
+        char scoreStr[10];
+        itoa(score, scoreStr, 10);
+
+        outtextxy(startXUser, yUser, user);
+        outtextxy(startXScore, yScore, scoreStr);
+
+        
+        yUser += lineSpacing;
+        yScore += lineSpacing;
+
+        count++;
+        if (count >= 6) { 
+            break;
+        }
+    }
+    file.close();
+
+    setbkcolor(BLACK); 
+    settextstyle(10, 0, 5);
+
+    
+    setcolor(GREEN);
+    char corecteStr[10];
+    itoa(corecte, corecteStr, 10);
+    outtextxy(522, 218, corecteStr);
+
+    setcolor(RED);
+    char gresiteStr[10];
+    itoa(gresite, gresiteStr, 10);
+    outtextxy(514, 281, gresiteStr);
 }
 
 
-void structura() {
+
+void bibl() {
     cleardevice();
-    settextstyle(8, 0, 5);
-    readimagefile("Imagini/Structura.gif", 0, 0, 1440, 800);
-    char opt[3], tasta;
-    int x, y, ok, z;
-    do
-    {
-        readimagefile("Imagini/Structura.gif", 0, 0, 1440, 800);
-        getmouseclick(WM_LBUTTONDOWN, x, y);
-        ok = 0;
-        if (x > 105 && x < 463 && y>202 && y < 286)
-        {
-            cleardevice();
-            introducere();
+    settextstyle(6, 0, 3);
+    readimagefile("Imagini/bibb.gif", 0, 0, 1440, 800);
+
+    int x, y;
+
+    while (1) {
+        if (ismouseclick(WM_LBUTTONDOWN)) {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+
+            if (x >= 1242 && x <= 1318 && y >= 82 && y <= 148) {
+                meniu_1();
+                return;  
+            }
         }
-        if (x > 100 && x < 462 && y>325 && y < 412)
-        {
-            motto();
-        }
-        if (x > 106 && x < 463 && y>455 && y < 535)
-        {
-            meniu_1();
-        }
-        if (x > 540 && x < 901 && y>581 && y < 665)
-        {
-            intro();
-        }
-        if (x > 538 && x < 904 && y>453 && y < 537)
-        {
-            afis();
-        }
-        if (x > 527 && x < 904 && y>324 && y < 414)
-        {
-            cautare();
-        }
-        if (x > 537 && x < 899 && y>198 && y < 289)
-        {
-            memo_dist();
-        }
-        if (x > 985 && x < 1342 && y>191 && y < 283)
-        {
-            quiz();
-        }
-        if (x > 970 && x < 1340 && y>321 && y < 415)
-        {
-            bibl();
-        }
-        if (x > 974 && x < 1338 && y>454 && y < 534)
-        {
-            structura();
-        }
-        if (x > 975 && x < 1343 && y>574 && y < 661)
-        {
-            autor();
+
+        if (ismouseclick(WM_MOUSEMOVE)) {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+
+            if (x >= 207 && x <= 558 && y >= 308 && y <= 394) {
+                readimagefile("Imagini/enc.gif", 0, 0, 1440, 800);
+            } else if (x >= 207 && x <= 558 && y >= 446 && y <= 530) {
+                readimagefile("Imagini/wik.gif", 0, 0, 1440, 800);
+            } else if (x >= 207 && x <= 558 && y >= 582 && y <= 668) {
+                readimagefile("Imagini/ora.gif", 0, 0, 1440, 800);
+            } else if (x >= 1242 && x <= 1318 && y >= 82 && y <= 148) {
+                readimagefile("Imagini/acasa.gif", 0, 0, 1440, 800);
+            } else {
+                readimagefile("Imagini/bibb.gif", 0, 0, 1440, 800);
+            }
         }
 
         if (kbhit()) {
             getch();
             meniu_1();
+            return;  
         }
-    } while (!ok);
+    }
+}
+	
+	
+void structura() {
+    cleardevice();
+    settextstyle(8, 0, 5);
+    readimagefile("Imagini/Structura.gif", 0, 0, 1440, 800);
+    char opt[3], tasta;  
+    int x, y, ok, z;
+
+    while (1) {
+        if (ismouseclick(WM_LBUTTONDOWN)) {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            ok = 0;
+
+            if (x >= 193 && x <= 486 && y >= 215 && y <= 289) {
+                introducere();
+            }
+            if (x >= 193 && x <= 486 && y >= 315 && y <= 387) {
+                motto();    
+            }
+            if (x >= 193 && x <= 486 && y >= 415 && y <= 487) {
+                meniu_1();
+            }
+            if (x >= 193 && x <= 486 && y >= 515 && y <= 587) {
+                intro();
+            }
+            if (x >= 193 && x <= 486 && y >= 615 && y <= 687) {
+                afis();
+            }
+            if (x >= 574 && x <= 870 && y >= 612 && y <= 687) {
+                foto();
+            }
+            if (x >= 574 && x <= 870 && y >= 515 && y <= 587) {
+                memo_dist();
+            }
+            if (x >= 574 && x <= 870 && y >= 415 && y <= 487) {
+                quiz();
+            }
+            if (x >= 574 && x <= 870 && y >= 315 && y <= 387) {
+                bibl();
+            }
+            if (x >= 574 && x <= 870 && y >= 215 && y <= 287) {
+                structura();
+            }
+            if (x >= 910 && x <= 1205 && y >= 215 && y <= 287) {
+                autor();
+            }
+
+            if (kbhit()) {
+                getch();
+                meniu_1();
+            }
+        }
+
+        if (ismouseclick(WM_MOUSEMOVE)) {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+
+            if (x >= 193 && x <= 486 && y >= 215 && y <= 289) {
+                readimagefile("Imagini/structura1.gif", 0, 0, 1440, 800);
+            } else if (x >= 193 && x <= 486 && y >= 315 && y <= 387) {
+                readimagefile("Imagini/structura2.gif", 0, 0, 1440, 800);
+            } else if (x >= 193 && x <= 486 && y >= 415 && y <= 487) {
+                readimagefile("Imagini/structura3.gif", 0, 0, 1440, 800);
+            } else if (x >= 193 && x <= 486 && y >= 515 && y <= 587) {
+                readimagefile("Imagini/structura4.gif", 0, 0, 1440, 800);
+            } else if (x >= 193 && x <= 486 && y >= 615 && y <= 687) {
+                readimagefile("Imagini/structura5.gif", 0, 0, 1440, 800);
+            } else if (x >= 574 && x <= 870 && y >= 612 && y <= 687) {
+                readimagefile("Imagini/structura6.gif", 0, 0, 1440, 800);
+            } else if (x >= 574 && x <= 870 && y >= 515 && y <= 587) {
+                readimagefile("Imagini/structura7.gif", 0, 0, 1440, 800);
+            } else if (x >= 574 && x <= 870 && y >= 415 && y <= 487) {
+                readimagefile("Imagini/structura8.gif", 0, 0, 1440, 800);
+            } else if (x >= 574 && x <= 870 && y >= 315 && y <= 387) {
+                readimagefile("Imagini/structura9.gif", 0, 0, 1440, 800);
+            } else if (x >= 574 && x <= 870 && y >= 215 && y <= 287) {
+                readimagefile("Imagini/structura10.gif", 0, 0, 1440, 800);
+            } else if (x >= 910 && x <= 1205 && y >= 215 && y <= 287) {
+                readimagefile("Imagini/structura11.gif", 0, 0, 1440, 800);
+            } else {
+                readimagefile("Imagini/Structura.gif", 0, 0, 1440, 800);
+            }
+        }
+    }
     getch();
     meniu_1();
 }
@@ -2089,9 +2471,6 @@ void autor() {
     int screenWidth = 1440, screenHeight = 800;
 
     readimagefile("Imagini/Autor.gif", 0, 0, screenWidth, screenHeight);
-    readimagefile("Autor/poza1.jpeg", 190, 340, 525, 720);
-    readimagefile("Autor/poza2.jpeg", 540, 340, 880, 720);
-    readimagefile("Autor/poza3.jpeg", 895, 340, 1230, 720);
     setbkcolor(BLACK);
     setcolor(WHITE);
     settextstyle(10, 0, 2);
@@ -2109,14 +2488,32 @@ void autor() {
         if (totalHeight + currentHeight <= textHeight) {
             outtextxy(textPosX + (textWidth - textwidth(linie)) / 2, textPosY + totalHeight, linie);
             totalHeight += currentHeight + 10;
-        }
-        else {
+        } else {
             break;
         }
     }
 
-    fis.close();
+    readimagefile("Autor/poza1.jpeg", 190, 345, 525, 740);
+    readimagefile("Autor/poza2.jpeg", 540, 345, 880, 740);
+    readimagefile("Autor/poza3.jpeg", 895, 345, 1230, 740);
 
+    void *buffer = malloc(imagesize(0, 0, screenWidth, screenHeight));
+    getimage(0, 0, screenWidth, screenHeight, buffer);
+
+    int x, y;
+    while (1) {
+        if (ismouseclick(WM_LBUTTONDOWN)) {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x >= 1248 && x <= 1335 && y >= 66 && y <= 133) {
+                meniu_1();
+                break;
+            }
+        }
+
+    }
+
+    free(buffer);
+    fis.close();
     getch();
     meniu_1();
 }
@@ -2125,14 +2522,14 @@ void autor() {
 void verific_user(char usernou[22]) {
     char numuser[99][20], pass[99][12];
     int ku = 0;
-    int ok = 1;
+    int ok = 1; 
     std::ifstream fi("useri.txt", std::ios::in);
     while (fi >> numuser[ku] >> pass[ku]) {
         ku++;
     }
     fi.close();
 
-    // Verificam daca usernou exista deja in fisierul useri.txt
+    
     for (int i = 0; i < ku; i++) {
         if (strcmp(usernou, numuser[i]) == 0) {
             ok = 0;
@@ -2144,9 +2541,9 @@ void verific_user(char usernou[22]) {
         readimagefile("Imagini/utilgresit.gif", 0, 0, 1440, 800);
         outtextxy(790, 250, usernou);
         delay(1000);
-        inregis();
+        inregis(); 
 
-
+        
         ku = 0;
         std::ifstream fi("useri.txt", std::ios::in);
         while (fi >> numuser[ku] >> pass[ku]) {
@@ -2154,7 +2551,7 @@ void verific_user(char usernou[22]) {
         }
         fi.close();
 
-
+      
         ok = 1;         for (int i = 0; i < ku; i++) {
             if (strcmp(usernou, numuser[i]) == 0) {
                 ok = 0;
@@ -2167,9 +2564,8 @@ void verific_user(char usernou[22]) {
         readimagefile("Imagini/utilgresit.gif", 0, 0, 1440, 800);
         outtextxy(790, 250, usernou);
         delay(1000);
-        inregis();
-    }
-    else {
+        inregis(); 
+    } else {
         readimagefile("Imagini/utilcorect.gif", 0, 0, 1440, 800);
         outtextxy(790, 250, usernou);
         delay(500);
@@ -2213,8 +2609,7 @@ int verific_pass(char usernou[22]) {
             outtextxy(790, 250, usernou);
             delay(1000);
             pass_ok = 0;
-        }
-        else {
+        } else {
             int spec_sau_num = 0;
             for (int i = 0; i < strlen(pass1); i++) {
                 if (!isalpha(pass1[i])) {
@@ -2227,8 +2622,7 @@ int verific_pass(char usernou[22]) {
                 outtextxy(790, 250, usernou);
                 outtextxy(790, 360, pass1_a);
                 delay(1000);
-            }
-            else {
+            } else {
                 readimagefile("Imagini/parolasimb.gif", 0, 0, 1440, 800);
                 outtextxy(790, 250, usernou);
                 delay(1000);
@@ -2258,8 +2652,7 @@ int verific_pass(char usernou[22]) {
                     outtextxy(790, 360, pass1_a);
                     outtextxy(790, 475, pass2_a);
                     delay(1000);
-
-                    char raspuns1[50], raspuns2[50], raspuns3[50];
+					char raspuns1[50], raspuns2[50], raspuns3[50];
                     k = 0;
 
                     readimagefile("Imagini/intreb1.gif", 0, 0, 1440, 800);
@@ -2276,8 +2669,7 @@ int verific_pass(char usernou[22]) {
                                 raspuns1[k + 1] = '\0';
                                 outtextxy(782, 366, raspuns1);
                                 k++;
-                            }
-                            else if (lit == 13) {
+                            } else if (lit == 13) {
                                 raspuns1[k] = '\0';
                                 break;
                             }
@@ -2285,7 +2677,8 @@ int verific_pass(char usernou[22]) {
                     }
 
                     ofstream fout("raspunsuri.txt", ios::app);
-                    fout << "Raspuns 1: " << raspuns1 << endl;
+					fout <<endl<< usernou << endl;
+                    fout << "" << raspuns1 << endl;
                     fout.close();
 
                     readimagefile("Imagini/intreb2.gif", 0, 0, 1440, 800);
@@ -2304,8 +2697,7 @@ int verific_pass(char usernou[22]) {
                                 raspuns2[k + 1] = '\0';
                                 outtextxy(782, 481, raspuns2);
                                 k++;
-                            }
-                            else if (lit == 13) {
+                            } else if (lit == 13) {
                                 raspuns2[k] = '\0';
                                 break;
                             }
@@ -2313,7 +2705,7 @@ int verific_pass(char usernou[22]) {
                     }
 
                     fout.open("raspunsuri.txt", ios::app);
-                    fout << "Raspuns 2: " << raspuns2 << endl;
+                    fout << "" << raspuns2 << endl;
                     fout.close();
 
                     readimagefile("Imagini/intreb3.gif", 0, 0, 1440, 800);
@@ -2333,8 +2725,7 @@ int verific_pass(char usernou[22]) {
                                 raspuns3[k + 1] = '\0';
                                 outtextxy(782, 590, raspuns3);
                                 k++;
-                            }
-                            else if (lit == 13) {
+                            } else if (lit == 13) {
                                 raspuns3[k] = '\0';
                                 break;
                             }
@@ -2342,14 +2733,14 @@ int verific_pass(char usernou[22]) {
                     }
 
                     fout.open("raspunsuri.txt", ios::app);
-                    fout << "Raspuns 3: " << raspuns3 << endl;
+                    fout << "" << raspuns3 << endl;
                     fout.close();
 
                     readimagefile("Imagini/correct.gif", 0, 0, 1440, 800);
                     outtextxy(782, 366, raspuns1);
                     outtextxy(782, 481, raspuns2);
                     outtextxy(782, 590, raspuns3);
-                    delay(1000);
+                    delay(850);
 
                     while (!inregistrat) {
                         if (ismouseclick(WM_MOUSEMOVE)) {
@@ -2359,8 +2750,7 @@ int verific_pass(char usernou[22]) {
                                 outtextxy(790, 250, usernou);
                                 outtextxy(790, 360, pass1_a);
                                 outtextxy(790, 475, pass2_a);
-                            }
-                            else {
+                            } else {
                                 readimagefile("Imagini/parola2ok.gif", 0, 0, 1440, 800);
                                 outtextxy(790, 250, usernou);
                                 outtextxy(790, 360, pass1_a);
@@ -2417,8 +2807,8 @@ int verific_pass(char usernou[22]) {
                                 outtextxy(790, 360, pass1_a);
                                 outtextxy(790, 475, pass2_a);
                                 delay(550);
-
-                                fo << endl << usernou << " " << pass1;
+								codific(usernou); 	codific(pass1);
+                                fo<<usernou << " " << pass1<<endl;
                                 fo.close();
 
                                 meniu_1();
@@ -2428,8 +2818,7 @@ int verific_pass(char usernou[22]) {
                     }
 
                     return pass_ok;
-                }
-                else {
+                } else {
                     incerc_gres++;
                     if (incerc_gres >= 3) {
                         num_gresite++;
@@ -2438,8 +2827,7 @@ int verific_pass(char usernou[22]) {
                             delay(1000);
                             meniu_1();
                             return 0;
-                        }
-                        else {
+                        } else {
                             readimagefile("Imagini/incorecta3.gif", 0, 0, 1440, 800);
                             delay(1000);
                             break;
@@ -2452,49 +2840,174 @@ int verific_pass(char usernou[22]) {
                     delay(1000);
                 }
             }
-        }
-        else {
+        } else {
             return 0;
         }
     }
 }
 
-
-
-
-
 void parolauitataof();
 
 
-void parolauitataof()
+void parolauitataof() 
 {
     cleardevice();
-    int k = 0;
-    char rsp1[99], rsp2[99], rsp3[99], lit;
+    char rsp[99];
+    char lit;
+    int k = 0,x,y;
+    int wordIndex = 0;
+    char userWords[3][99]; 
+
     readimagefile("Imagini/parolauitata1.gif", 0, 0, 1440, 800);
-    do {
-        if (kbhit()) {
-            lit = getch();
-            if (isalpha(lit) || isdigit(lit)) {
-                rsp1[k] = lit;
-                k++;
-                rsp1[k] = '\0';
+
+    while (wordIndex < 3) {
+        k = 0; 
+        rsp[k] = '\0'; 
+
+
+        do {
+            if (kbhit()) {
+                lit = getch();
+                if (lit == '\r') { 
+                    rsp[k] = '\0'; 
+                    strcpy(userWords[wordIndex], rsp);
+                    outtextxy(500, 308 + (wordIndex * 112), rsp); 
+                    wordIndex++;
+                    if (wordIndex < 3) {
+                    }
+                    break;
+                } else if (isalpha(lit) || isdigit(lit) || lit == ' ') { 
+                    rsp[k] = lit;
+                    k++;
+                    rsp[k] = '\0';
+                    outtextxy(500, 308 + (wordIndex * 112), rsp); 
+                }
             }
-            outtextxy(487, 303, rsp1);
+        } while (true); // continua pÃ¢na cÃ¢nd apasam Enter
+    }
+
+    while (true) {
+        if (ismouseclick(WM_LBUTTONDOWN)) {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x >= 550 && x <= 888 && y >= 611 && y <= 677) { 
+                break;
+            }
+			
+        if (ismouseclick(WM_MOUSEMOVE)) {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+            if (x >= 550 && x <= 888 && y >= 611 && y <= 677) { 
+			readimagefile("Imagini/parolauitata1hov.gif", 0, 0, 1440, 800);
+            } else
+			{
+			readimagefile("Imagini/parolauitata1.gif", 0, 0, 1440, 800);
+			}
+		}
         }
-    } while (lit != char(13));
+    }
+
+    std::ifstream file("raspunsuri.txt"); 
+
+    char line[256];
+    bool foundUser = false;
+    char fileWords[3][99];
+    while (file.getline(line, sizeof(line))) {
+        if (strcmp(line, user) == 0) { 
+            foundUser = true;
+            for (int i = 0; i < 3 && file.getline(line, sizeof(line)); ++i) {
+                strcpy(fileWords[i], line);
+            }
+            break;
+        }
+    }
+    file.close();
+
+    if (!foundUser) {
+        std::cerr << "Numele nu a fost gasit Ã®n fisier." << std::endl;
+        return;
+    }
+
+    bool allMatch = true;
+    for (int i = 0; i < 3; ++i) {
+        if (strcmp(userWords[i], fileWords[i]) != 0) {
+            allMatch = false;
+            break;
+        }
+    }
+
+    if (allMatch) {
+        cuvpotr(); 
+    } else {
+        cuvnepotr();
+    }
+
     getch();
     meniu_1();
+}
 
 
+void cuvpotr() {
+    int x, y;
+    cleardevice();
+    readimagefile("Imagini/datecor.gif", 0, 0, 1440, 800);
+    
+    std::ifstream parpotr("useripass.txt");
+    if (!parpotr.is_open()) {
+        std::cerr << "Nu am putut deschide fi?ierul." << std::endl;
+        return;
+    }
+    
+    char line[256];
+    char username[99], password[99];
+    bool foundUser = false;
+
+    while (parpotr.getline(line, sizeof(line))) {
+        std::istringstream iss(line);
+        iss >> username >> password;
+        if (strcmp(username, user) == 0) {
+            foundUser = true;
+            break;
+        }
+    }
+    parpotr.close();
+
+    if (foundUser)
+        outtextxy(509, 416, password);
+    
+
+ 
+    while (true) {
+        if (ismouseclick(WM_LBUTTONDOWN)) {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x >= 552 && x <= 888 && y >= 538 && y <= 608) { 
+                autentificare();
+                break; 
+            }
+        }
+    }
+}
+
+
+void cuvnepotr()
+{
+	int x,y;
+	readimagefile("Imagini/dateincor.gif", 0, 0, 1440, 800);
+		while (true) {
+        if (ismouseclick(WM_LBUTTONDOWN)) {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            if (x >= 552 && x <= 888 && y >= 456 && y <= 530) { // Verifica daca clicul este Ã®n zona specificata
+                meniu_1();
+            }
+		}}
+	
 }
 
 
 void autentificare() {
-    char numuser[99][20], pass[99][12], user[20], password[12], password_a[12], lit;
+    char numuser[99][20],password[12],pass[99][12], password_a[12];;
+    char lit;
     int x, y, i, ku = 0, user_found = 0;
-    int k = 0, inregistrat = 0, incercari = 0;
-    int incercari_gresite_admin = 0; // Numaratoare încercari gre?ite pentru admin
+    int k = 0, incercari = 0;
+    int incercari_gresite_admin = 0;
 
     user[0] = '\0';
     readimagefile("Imagini/autnum.gif", 0, 0, 1440, 800);
@@ -2502,11 +3015,17 @@ void autentificare() {
     setbkcolor(WHITE);
     settextstyle(10, 0, 4);
 
-    std::ifstream fi("useri.txt");
+    fstream fssss("useripass.txt", ios::out);
+    ifstream fi("useri.txt");
+
     while (fi >> numuser[ku] >> pass[ku]) {
+        decodific(numuser[ku]);
+        decodific(pass[ku]);
+        fssss << numuser[ku] << " " << pass[ku] << endl;
         ku++;
     }
     fi.close();
+    fssss.close();
 
     do {
         if (kbhit()) {
@@ -2522,40 +3041,30 @@ void autentificare() {
         if (ismouseclick(WM_MOUSEMOVE)) {
             getmouseclick(WM_MOUSEMOVE, x, y);
             if (strcmp(user, "admin") == 0) {
-                // Verificare pentru butonul "Parola uitata pentru admin"
-                if (incercari_gresite_admin >= 3 && x > 810 && x < 515 && y > 984 && y < 539) {
+                if (incercari_gresite_admin >= 1 && x > 810 && x < 984 && y > 515 && y < 539) {
                     readimagefile("Imagini/paruitataadmin.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                }
-                else {
+                } else {
                     readimagefile("Imagini/autadmin.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
                 }
-            }
-            else {
-                // Verificare pentru butonul de autentificare pentru utilizator normal
+                outtextxy(824, 340, user);
+            } else {
                 if (x > 94 && x < 183 && y > 79 && y < 156) {
                     readimagefile("Imagini/autnumhov.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                }
-                else {
+                } else {
                     readimagefile("Imagini/autnum.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
                 }
+                outtextxy(824, 340, user);
             }
         }
 
         if (ismouseclick(WM_LBUTTONDOWN)) {
             getmouseclick(WM_LBUTTONDOWN, x, y);
             if (strcmp(user, "admin") == 0) {
-                // Verificare pentru butonul "Parola uitata pentru admin"
-                if (incercari_gresite_admin >= 3 && x > 810 && x < 515 && y > 984 && y < 539) {
+                if (incercari_gresite_admin >= 1 && x > 810 && x < 984 && y > 515 && y < 539) {
                     parolauitataof();
                     return;
                 }
-            }
-            else {
-                // Verificare pentru butonul de autentificare pentru utilizator normal
+            } else {
                 if (x > 94 && x < 183 && y > 79 && y < 156) {
                     meniu_1();
                     return;
@@ -2563,6 +3072,7 @@ void autentificare() {
             }
         }
     } while (lit != char(13));
+
     for (i = 0; i < ku; i++) {
         if (strcmp(user, numuser[i]) == 0) {
             user_found = 1;
@@ -2573,13 +3083,11 @@ void autentificare() {
     if (user_found) {
         if (strcmp(user, "admin") == 0) {
             readimagefile("Imagini/autadmin.gif", 0, 0, 1440, 800);
-        }
-        else {
+        } else {
             readimagefile("Imagini/autnumcor.gif", 0, 0, 1440, 800);
         }
         outtextxy(824, 340, user);
-    }
-    else {
+    } else {
         readimagefile("Imagini/usergresit.gif", 0, 0, 1440, 800);
         outtextxy(824, 340, user);
         delay(1000);
@@ -2595,7 +3103,7 @@ void autentificare() {
             lit = getch();
             if (isgraph(lit)) {
                 password[k] = lit;
-                password_a[k] = '*'; // Afisam '*' in locul caracterului introdus
+                password_a[k] = '*';
                 k++;
                 password[k] = '\0';
                 password_a[k] = '\0';
@@ -2606,8 +3114,7 @@ void autentificare() {
         if (strcmp(password, pass[i]) == 0) {
             if (strcmp(user, "admin") == 0) {
                 readimagefile("Imagini/autadmincorect.gif", 0, 0, 1440, 800);
-            }
-            else {
+            } else {
                 readimagefile("Imagini/auteusercorect.gif", 0, 0, 1440, 800);
             }
             outtextxy(824, 340, user);
@@ -2619,18 +3126,15 @@ void autentificare() {
                     if (x > 881 && x < 1214 && y > 563 && y < 634) {
                         if (strcmp(user, "admin") == 0) {
                             readimagefile("Imagini/autadmincorecthov.gif", 0, 0, 1440, 800);
-                        }
-                        else {
+                        } else {
                             readimagefile("Imagini/auteusercorecthover.gif", 0, 0, 1440, 800);
                         }
                         outtextxy(824, 340, user);
                         outtextxy(824, 460, password_a);
-                    }
-                    else {
+                    } else {
                         if (strcmp(user, "admin") == 0) {
                             readimagefile("Imagini/autadmincorect.gif", 0, 0, 1440, 800);
-                        }
-                        else {
+                        } else {
                             readimagefile("Imagini/auteusercorect.gif", 0, 0, 1440, 800);
                         }
                         outtextxy(824, 340, user);
@@ -2638,46 +3142,12 @@ void autentificare() {
                     }
                 }
 
-                if (ismouseclick(WM_LBUTTONDOWN)) {
+                                if (ismouseclick(WM_LBUTTONDOWN)) {
                     getmouseclick(WM_LBUTTONDOWN, x, y);
                     if (x > 881 && x < 1214 && y > 563 && y < 634) {
-                        if (strcmp(user, "admin") == 0) {
+							if (strcmp(user, "admin") == 0) {
                             inregistrat = 1;
-                            readimagefile("Imagini/a1.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            readimagefile("Imagini/a2.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            readimagefile("Imagini/a3.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            readimagefile("Imagini/a4.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            readimagefile("Imagini/a5.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            readimagefile("Imagini/a6.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            readimagefile("Imagini/a7.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            readimagefile("Imagini/a8.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            readimagefile("Imagini/a9.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            readimagefile("Imagini/corrrrect.gif", 0, 0, 1440, 800);
-                            outtextxy(824, 340, user);
-                            outtextxy(824, 460, password_a);
-                            delay(550);
-                            meniu_1();
-                        }
-                        else {
-                            inregistrat = 1;
+							adminn=1;
                             readimagefile("Imagini/ad1.gif", 0, 0, 1440, 800);
                             outtextxy(824, 340, user);
                             outtextxy(824, 460, password_a);
@@ -2702,59 +3172,172 @@ void autentificare() {
                             readimagefile("Imagini/ad8.gif", 0, 0, 1440, 800);
                             outtextxy(824, 340, user);
                             outtextxy(824, 460, password_a);
+                            readimagefile("Imagini/ad9.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
                             readimagefile("Imagini/cor.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
+                            delay(550);
+                            meniu_1();
+                        } else {
+                            inregistrat = 1;
+							adminn=0;
+                            readimagefile("Imagini/a1.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
+                            readimagefile("Imagini/a2.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
+                            readimagefile("Imagini/a3.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
+                            readimagefile("Imagini/a4.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
+                            readimagefile("Imagini/a5.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
+                            readimagefile("Imagini/a6.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
+                            readimagefile("Imagini/a7.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
+                            readimagefile("Imagini/a8.gif", 0, 0, 1440, 800);
+                            outtextxy(824, 340, user);
+                            outtextxy(824, 460, password_a);
+                            readimagefile("Imagini/corrrrect.gif", 0, 0, 1440, 800);
                             outtextxy(824, 340, user);
                             outtextxy(824, 460, password_a);
                             delay(550);
                         }
                         meniu_1();
                     }
-                }
-            }
-        }
-        else {
+								}}
+            } else {
             if (strcmp(user, "admin") == 0) {
                 incercari_gresite_admin++;
 
                 if (incercari_gresite_admin == 1) {
                     readimagefile("Imagini/paradmingres.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                    delay(1000);
-                    readimagefile("Imagini/autadmin.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                }
-                else if (incercari_gresite_admin == 4) {
+                } else if (incercari_gresite_admin == 3) {
+					readimagefile("Imagini/paradmingres.gif", 0, 0, 1440, 800);
+					outtextxy(824, 340, user);
+					delay(200); 
+                    readimagefile("Imagini/paruitataadmin.gif", 0, 0, 1440, 800);
+					outtextxy(824, 340, user);
+                    delay(1000); // A?teapta 2 secunde
+                    parolauitataof();
+                    return; // Ie?i din func?ie dupa ce ai apelat parolauitataof
+                } else {
                     readimagefile("Imagini/paradmingres.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                    delay(1000);
-                    exit(0); // Închidem programul daca s-au depa?it 4 încercari gre?ite pentru admin
                 }
-                else {
-                    readimagefile("Imagini/paradmingres.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                    delay(1000);
-                    readimagefile("Imagini/autadmin.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                }
-            }
-            else {
-                // Daca parola este gre?ita pentru utilizator normal
+                outtextxy(824, 340, user);
+                delay(1000);
+                readimagefile("Imagini/autadmin.gif", 0, 0, 1440, 800);
+                outtextxy(824, 340, user);
+            } else {
                 if (incercari >= 3) {
+					readimagefile("Imagini/parusergres.gif", 0, 0, 1440, 800);
+					outtextxy(824, 340, user);
+					delay(200);
+                    readimagefile("Imagini/paruitata.gif", 0, 0, 1440, 800);
+					outtextxy(824, 340, user);
+                    delay(2000);
+                    parolauitataof();
+                    return; 
+                } else {
                     readimagefile("Imagini/parusergres.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                    delay(1000);
-                    exit(0); // Închidem programul daca s-au depa?it 3 încercari
                 }
-                else {
-                    readimagefile("Imagini/parusergres.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                    delay(1000);
-                    readimagefile("Imagini/autnumcor.gif", 0, 0, 1440, 800);
-                    outtextxy(824, 340, user);
-                }
+                outtextxy(824, 340, user);
+                delay(1000);
+                readimagefile("Imagini/autnumcor.gif", 0, 0, 1440, 800);
+                outtextxy(824, 340, user);
+            }
+        }
+    }
+}
+void administrare()
+{
+	readimagefile("Imagini/administrator.gif", 0, 0, 1440, 800);
+	int x, y, ok, z;
+
+    while (1) {
+        if (ismouseclick(WM_LBUTTONDOWN)) {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+            ok = 0;
+
+            if (x >= 235 && x <= 589 && y >= 295 && y <= 380) {
+                system("notepad.exe autor.txt");
+            }
+            if (x >= 352 && x <= 705 && y >= 450 && y <= 534) {
+                system("notepad.exe README.txt");    
+            }
+            if (x >= 731 && x <= 1089 && y >= 452&& y <= 536) {
+                system("notepad.exe distantele.txt");
+            }
+            if (x >= 848 && x <= 1208 && y >= 295 && y <= 379) {
+                system("notepad.exe useripass.txt");
+            }
+			if (x >= 1242 && x <= 1317 && y >= 79 && y <= 148) {
+                meniu_1();
+            }
+        }
+
+        if (ismouseclick(WM_MOUSEMOVE)) {
+            getmouseclick(WM_MOUSEMOVE, x, y);
+
+            if (x >= 235 && x <= 589 && y >= 295 && y <= 380) {
+                readimagefile("Imagini/admaut.gif", 0, 0, 1440, 800);
+            } else if (x >= 352 && x <= 705 && y >= 450 && y <= 534) {
+                readimagefile("Imagini/admrdm.gif", 0, 0, 1440, 800);
+            } else if (x >= 731 && x <= 1089 && y >= 452&& y <= 536) {
+                readimagefile("Imagini/admdist.gif", 0, 0, 1440, 800);
+            } else if (x >= 848 && x <= 1208 && y >= 295 && y <= 379) {
+                readimagefile("Imagini/admuser.gif", 0, 0, 1440, 800);
+			}else if (x >= 1242 && x <= 1317 && y >= 79 && y <= 148) {
+                readimagefile("Imagini/admhom.gif", 0, 0, 1440, 800);
+            } else {
+                readimagefile("Imagini/administrator.gif", 0, 0, 1440, 800);
             }
         }
     }
 }
 
 
+
+int codific(char cuv[99]) {
+    int n, i, x;
+    char cuv_nou[100];
+    n = strlen(cuv);
+    x = rand() % 70 + 33;
+    cuv_nou[0] = char(n + 33); 
+    cuv_nou[1] = char(x); 
+
+    for (i = 2; i < n + 2; i++)
+        cuv_nou[i] = cuv[i - 2] + x;
+
+    for (i = n + 2; i < 32; i++)
+        cuv_nou[i] = char(rand() % 200 + 30);
+
+    cuv_nou[32] = '\0'; 
+
+    strcpy(cuv, cuv_nou);
+    return 0;
+}
+
+int decodific(char cuv_codat[99]) {
+    int n, i, x;
+    char cuv[99];
+    n = int(cuv_codat[0]) - 33; 
+    x = int(cuv_codat[1]); 
+
+    for (i = 2; i < n + 2; i++) {
+        cuv[i - 2] = cuv_codat[i] - x;
+    }
+    cuv[n] = '\0'; 
+
+    strcpy(cuv_codat, cuv);
+    return 0;
+}
